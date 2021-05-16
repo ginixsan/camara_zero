@@ -9,8 +9,7 @@ function broadcastFrame(data,socket) {
     //         }
     //     });
     // }
-    console.log('emito frame sent');
-    console.log(data);
+    
     socket.emit('imagen',{
         frame:data,
         camera:'dsdsdsds',
