@@ -27,6 +27,7 @@
     "pi-camera-connect": "^0.3.4",
     "socket.io": "^2.4.1",
     "socket.io-client": "^2.4.0",
-    "ws": "^7.3.0"
+    "ws": "^7.3.0",
+    "raspi-serial-number": "^1.0.6"
   }
 }

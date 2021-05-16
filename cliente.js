@@ -18,22 +18,31 @@ function broadcastFrame(data,socket) {
     })
 };
 function openWsServer() {
-    var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
-        query: {
-          access_token: 'camaron',
-          serial:'100000009c73d022'
+    getSerialNumber((error,data) => {
+        if(error)
+        {
+          console.error("Callback error: ",error);
         }
-      });
+        else
+        {
+            var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
+                query: {
+                access_token: 'camaron',
+                camera:true,
+                serial:data
+                }
+            });
 
-      socketCliente.on('connect', function(){
-        console.log('conectado')
-      });
+            socketCliente.on('connect', function(){
+                console.log('conectado')
+            });
 
-      socketCliente.on('event', function(data){});
+            socketCliente.on('event', function(data){});
 
-      socketCliente.on('disconnect', function(){
-        console.log('me he desoncectado');
-      });
+            socketCliente.on('disconnect', function(){
+                console.log('me he desoncectado');
+            });
+        }
     return socketCliente;
 };
 function startCamera(socket) {
