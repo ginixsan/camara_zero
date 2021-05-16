@@ -33,7 +33,7 @@ function openWsServer() {
       socketCliente.on('disconnect', function(){
         console.log('me he desoncectado');
       });
-    return socket;
+    return socketCliente;
 };
 function startCamera(socket) {
     const streamCamera = new StreamCamera({
