@@ -20,7 +20,7 @@ function openWsServer() {
     var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
         query: {
           access_token: 'camaron',
-          serial:data
+          serial:'data'
         }
       });
 
