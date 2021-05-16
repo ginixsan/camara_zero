@@ -5,7 +5,7 @@ const path           = require('path');
 const errorHandler   = require('errorhandler');
 const logger         = require('morgan');
 const methodOverride = require('method-override');
-const { StreamCamera, Codec } = require('pi-camera-connect');
+const { StreamCamera, Codec,Rotation,Flip } = require('pi-camera-connect');
 const WebSocket      = require('ws');
 
 // handle to our websocket server instance
@@ -54,7 +54,8 @@ function startCamera() {
         width: 640,
         height: 480,
         // increase this to reduce compression artefacts
-        bitRate: 10000000 
+        bitRate: 10000000,
+        flip:Flip.Both
     });
     streamCamera.startCapture().then(() => {
         console.log(`# Camera started`);
