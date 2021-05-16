@@ -48,30 +48,31 @@ function broadcastFrame(data) {
 };
 
 function startCamera() {
-    const streamCamera = new StreamCamera({
-        codec: Codec.MJPEG,
-        fps: 20,
-        width: 640,
-        height: 480,
-        // increase this to reduce compression artefacts
-        bitRate: 10000000 
-    });
-    const videoStream = streamCamera.createStream();
-    streamCamera.startCapture().then(() => {
-        console.log(`# Camera started`);
-    })
-    .catch(e => {
-        console.log(`% Error opening camera: ${e}`);
-    });
-
-    videoStream.on('frame', data => {
-        // you can add some processing to frame data here
-        // e.g let Mat = cv.imdecode(data)
-        console.log('tengo frame');
-        broadcastFrame(data);
-    });
+    
 }
 
 openWebServer();
 openWsServer();
 startCamera();
+const streamCamera = new StreamCamera({
+    codec: Codec.MJPEG,
+    fps: 20,
+    width: 640,
+    height: 480,
+    // increase this to reduce compression artefacts
+    bitRate: 10000000 
+});
+const videoStream = streamCamera.createStream();
+streamCamera.startCapture().then(() => {
+    console.log(`# Camera started`);
+})
+.catch(e => {
+    console.log(`% Error opening camera: ${e}`);
+});
+
+streamCamera.on('frame', data => {
+    // you can add some processing to frame data here
+    // e.g let Mat = cv.imdecode(data)
+    console.log('tengo frame');
+    broadcastFrame(data);
+});
