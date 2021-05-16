@@ -56,7 +56,7 @@ function startCamera() {
         // increase this to reduce compression artefacts
         bitRate: 10000000 
     });
-
+    const videoStream = streamCamera.createStream();
     streamCamera.startCapture().then(() => {
         console.log(`# Camera started`);
     })
@@ -64,7 +64,7 @@ function startCamera() {
         console.log(`% Error opening camera: ${e}`);
     });
 
-    streamCamera.on('frame', data => {
+    videoStream.on('frame', data => {
         // you can add some processing to frame data here
         // e.g let Mat = cv.imdecode(data)
         console.log('tengo frame');
