@@ -9,7 +9,7 @@ function broadcastFrame(data,socket) {
     //         }
     //     });
     // }
-    socket.emit('frame',{
+    socket.emit('imagen',{
         frame:data,
         camera:'dsdsdsds',
         video:'abc'
