@@ -40,7 +40,7 @@ function openWsServer() {
 function startCamera(socket) {
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
-        fps: 20,
+        fps: 2,
         width: 640,
         height: 480,
         // increase this to reduce compression artefacts
@@ -60,7 +60,10 @@ function startCamera(socket) {
         console.log('tengo frame');
         broadcastFrame(data,socket);
     });
-    
+    return streamCamera;
+}
+function stopCamera(streamCamera) {
+    streamCamera.stopCapture();
 }
 // var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
 //         query: {
@@ -90,9 +93,11 @@ socketCliente.on('connect', function(){
 console.log('conectado')
 });
 
-socketCliente.on('event', function(data){});
+socketCliente.on('paraCamara', function(data){
+
+});
 
 socketCliente.on('disconnect', function(){
 console.log('me he desoncectado');
 });
-startCamera(socketCliente);
+var streamCamera=startCamera(socketCliente);
