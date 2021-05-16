@@ -26,6 +26,7 @@
     "morgan": "^1.10.0",
     "pi-camera-connect": "^0.3.4",
     "socket.io": "^4.1.1",
+    "socket.io-client": "^4.1.1",
     "ws": "^7.3.0"
   }
 }

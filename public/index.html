@@ -11,30 +11,34 @@
         var ctx = canvas.getContext('2d');
 
         function openWS(port, ctx) {
-            var ws = new WebSocket(`ws://${window.location.hostname}:${port}`);
+            const socket = io("https://192.168.1.142:8082");
+            socket.on("connect", () => {
+                console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+            });
+            
+            socket.on("disconnect", () => {
+            console.log(socket.id); // undefined
+            });
+            // var ws = new WebSocket(`ws://${window.location.hostname}:${port}`);
 
-            // the nodejs buffer is array of UInt8
-            // so we can cast it to JS arraybuffer without any conversion 
-            ws.binaryType = 'arraybuffer';
+            // // the nodejs buffer is array of UInt8
+            // // so we can cast it to JS arraybuffer without any conversion 
+            // ws.binaryType = 'arraybuffer';
 
-            ws.onopen = () => {
-                console.log(`# Opened WS connection to ${window.location.hostname}:${port}`);
-            };
+            // ws.onopen = () => {
+            //     console.log(`# Opened WS connection to ${window.location.hostname}:${port}`);
+            // };
 
-            ws.onclose = () => {
-                console.log(`% WS closed connection to ${window.location.hostname}:${port}`);
+            // ws.onclose = () => {
+            //     console.log(`% WS closed connection to ${window.location.hostname}:${port}`);
 
-                // auto reconnect every 2 seconds
-                setTimeout(() => {
-                    openWS(port, ctx);
-                }, 2000);
-            };
-
-            ws.onmessage = (event) => {
-                try {
-                    // we creating blob then image from recieved binary data
-                    // actually I just copied this from some SO answer and it worked
-                    var arrayBufferView = new Uint8Array(event.data);
+            //     // auto reconnect every 2 seconds
+            //     setTimeout(() => {
+            //         openWS(port, ctx);
+            //     }, 2000);
+            // };
+            socket.on('imagenweb',function(data){
+                var arrayBufferView = new Uint8Array(event.data);
                     var blob = new Blob([ arrayBufferView ], { type: "image/jpeg" });
                     var urlCreator = window.URL || window.webkitURL;
                     var imageUrl = urlCreator.createObjectURL(blob);
@@ -48,12 +52,31 @@
 
                         ctx.drawImage(img, 0, 0);
                     };
-                }
-                catch (e) { }
-            };
+            });
+            // ws.onmessage = (event) => {
+            //     try {
+            //         // we creating blob then image from recieved binary data
+            //         // actually I just copied this from some SO answer and it worked
+            //         var arrayBufferView = new Uint8Array(event.data);
+            //         var blob = new Blob([ arrayBufferView ], { type: "image/jpeg" });
+            //         var urlCreator = window.URL || window.webkitURL;
+            //         var imageUrl = urlCreator.createObjectURL(blob);
+
+            //         var img = new Image();
+            //         img.src = imageUrl;
+            //         img.onload = function() {
+            //             // resize canvas if not equal to image size
+            //             if (ctx.canvas.width  != img.width ) { ctx.canvas.width  = img.width; }
+            //             if (ctx.canvas.height != img.height) { ctx.canvas.height = img.height; }
+
+            //             ctx.drawImage(img, 0, 0);
+            //         };
+            //     }
+            //     catch (e) { }
+            // };
         }
 
-        openWS(8081, ctx);
+        openWS(8082, ctx);
     </script>
 </body>
 </html>

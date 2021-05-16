@@ -2,14 +2,17 @@
 
 const express        = require('express');
 const path           = require('path');
+const http = require('http');
 const errorHandler   = require('errorhandler');
 const logger         = require('morgan');
 const methodOverride = require('method-override');
 const { StreamCamera, Codec,Rotation,Flip } = require('pi-camera-connect');
 const WebSocket      = require('ws');
-
+const socketIOProvider = require('socket.io');
+const { info } = require('console');
 // handle to our websocket server instance
 var wsHandle;
+
 
 function openWebServer() {
     var app = express();
@@ -28,12 +31,23 @@ function openWebServer() {
 
         console.log(`# Web server is listening on port ${appPort}`);
     });
+    const server = http.Server(app);
+    server.listen(8082, () => {
+        console.log('Listening on', 8082);
+    });
+    return server;
 };
 
 function openWsServer() {
-    wsHandle = new WebSocket.Server({ port: 8081 });
-
+   // wsHandle = new WebSocket.Server({ port: 8081 });
+    const io = socketIOProvider(server);
     console.log(`# WS server opened on ${8081}`);
+    io.on('connect', function(socket) {
+        console.log('socket conectado');
+    });
+    io.on('imagen', function(data) {
+        io.emit('imagenweb',data);
+    })
 };
 
 function broadcastFrame(data) {
@@ -73,6 +87,6 @@ function startCamera() {
     
 }
 
-openWebServer();
-openWsServer();
+var server=openWebServer();
+openWsServer(server);
 startCamera();
