@@ -76,3 +76,4 @@ streamCamera.on('frame', data => {
     console.log('tengo frame');
     broadcastFrame(data);
 });
+videoStream.on("data", data => console.log("New data", data));
