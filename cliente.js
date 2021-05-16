@@ -17,10 +17,10 @@ function broadcastFrame(data,socket) {
     })
 };
 function openWsServer() {
-    socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
+    var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
         query: {
           access_token: 'camaron',
-          serial:'dsdsdssd'
+          serial:data
         }
       });
 
@@ -33,8 +33,6 @@ function openWsServer() {
       socketCliente.on('disconnect', function(){
         console.log('me he desoncectado');
       });
-
-    console.log(`# WS server opened on ${8082}`);
     return socket;
 };
 function startCamera(socket) {
@@ -62,20 +60,21 @@ function startCamera(socket) {
     });
     
 }
-var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
-        query: {
-          access_token: 'camaron',
-          serial:data
-        }
-      });
+// var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
+//         query: {
+//           access_token: 'camaron',
+//           serial:data
+//         }
+//       });
 
-      socketCliente.on('connect', function(){
-        console.log('conectado')
-      });
+//       socketCliente.on('connect', function(){
+//         console.log('conectado')
+//       });
 
-      socketCliente.on('event', function(data){});
+//       socketCliente.on('event', function(data){});
 
-      socketCliente.on('disconnect', function(){
-        console.log('me he desoncectado');
-      });
+//       socketCliente.on('disconnect', function(){
+//         console.log('me he desoncectado');
+//       });
+var socketCliente = openWsServer();
 startCamera(socketCliente);
