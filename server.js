@@ -67,6 +67,7 @@ function startCamera() {
     streamCamera.on('frame', data => {
         // you can add some processing to frame data here
         // e.g let Mat = cv.imdecode(data)
+        console.log('tengo frame');
         broadcastFrame(data);
     });
 }
