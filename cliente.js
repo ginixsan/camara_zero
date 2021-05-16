@@ -78,5 +78,21 @@ function startCamera(socket) {
 //       socketCliente.on('disconnect', function(){
 //         console.log('me he desoncectado');
 //       });
-var socketCliente = openWsServer();
+//var socketCliente = openWsServer();
+var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
+        query: {
+          access_token: 'camaron',
+          serial:'100000009c73d022'
+        }
+});
+
+socketCliente.on('connect', function(){
+console.log('conectado')
+});
+
+socketCliente.on('event', function(data){});
+
+socketCliente.on('disconnect', function(){
+console.log('me he desoncectado');
+});
 startCamera(socketCliente);
