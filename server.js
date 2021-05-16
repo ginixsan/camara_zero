@@ -62,7 +62,6 @@ const streamCamera = new StreamCamera({
     // increase this to reduce compression artefacts
     bitRate: 10000000 
 });
-const videoStream = streamCamera.createStream();
 streamCamera.startCapture().then(() => {
     console.log(`# Camera started`);
 })
@@ -76,4 +75,3 @@ streamCamera.on('frame', data => {
     console.log('tengo frame');
     broadcastFrame(data);
 });
-videoStream.on("data", data => console.log("New data", data));
