@@ -60,7 +60,7 @@ function openServerCentral() {
         });
 
         socketCliente.on('connect', function(){
-        console.log('conectado')
+            console.log('conectado central');
         });
 
         socketCliente.on('stopLive', function(data){
@@ -72,7 +72,7 @@ function openServerCentral() {
         socketCliente.on('disconnect', function(){
             console.log('me he desoncectado');
             stopCamera(camara);
-            });
+        });
     return socketCliente;
 });
         
@@ -97,7 +97,7 @@ function openServerCerebro()
         });
         encrypt('secreto')(socketCerebro);
         socketCerebro.on('connect', function(){
-            console.log('conectado')
+            console.log('conectado cerebro')
         });
 
         socketCerebro.on('disconnect', function(){
