@@ -1,5 +1,6 @@
 const { StreamCamera, Codec,Rotation,Flip } = require('pi-camera-connect');
 const io = require("socket.io-client");
+const exec = require( 'child_process' ).exec;
 
 var camara,socket;
 var hayPresencia=false;
