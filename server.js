@@ -2,14 +2,17 @@
 
 const express        = require('express');
 const path           = require('path');
+const http = require('http');
 const errorHandler   = require('errorhandler');
 const logger         = require('morgan');
 const methodOverride = require('method-override');
-const { StreamCamera, Codec } = require('pi-camera-connect');
+//const { StreamCamera, Codec,Rotation,Flip } = require('pi-camera-connect');
 const WebSocket      = require('ws');
-
+const socketIOProvider = require('socket.io');
+const { info } = require('console');
 // handle to our websocket server instance
 var wsHandle;
+
 
 function openWebServer() {
     var app = express();
@@ -28,12 +31,25 @@ function openWebServer() {
 
         console.log(`# Web server is listening on port ${appPort}`);
     });
+    const server = http.Server(app);
+    server.listen(8082, () => {
+        console.log('Listening on', 8082);
+    });
+    return server;
 };
 
 function openWsServer() {
-    wsHandle = new WebSocket.Server({ port: 8081 });
-
+   // wsHandle = new WebSocket.Server({ port: 8081 });
+    const io = socketIOProvider(server,{});
     console.log(`# WS server opened on ${8081}`);
+    io.on('connection', (socket) => {
+        console.log('socket conectado');
+        socket.on('imagen', function(data) {
+            io.sockets.emit('imagenweb',data);
+        })
+
+    });
+    
 };
 
 function broadcastFrame(data) {
@@ -54,23 +70,25 @@ function startCamera() {
         width: 640,
         height: 480,
         // increase this to reduce compression artefacts
-        bitRate: 10000000 
+        bitRate: 10000000,
+        flip:Flip.Both
     });
-
     streamCamera.startCapture().then(() => {
         console.log(`# Camera started`);
     })
     .catch(e => {
         console.log(`% Error opening camera: ${e}`);
     });
-
+    
     streamCamera.on('frame', data => {
         // you can add some processing to frame data here
         // e.g let Mat = cv.imdecode(data)
+        console.log('tengo frame');
         broadcastFrame(data);
     });
+    
 }
 
-openWebServer();
-openWsServer();
-startCamera();
+var server=openWebServer();
+openWsServer(server);
+//startCamera();

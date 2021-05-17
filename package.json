@@ -24,7 +24,10 @@
     "express": "^4.17.1",
     "method-override": "^3.0.0",
     "morgan": "^1.10.0",
-    "pi-camera-connect": "^0.3.0",
-    "ws": "^7.3.0"
+    "pi-camera-connect": "^0.3.4",
+    "socket.io": "^2.4.1",
+    "socket.io-client": "^2.4.0",
+    "ws": "^7.3.0",
+    "raspi-serial-number": "^1.0.6"
   }
 }
