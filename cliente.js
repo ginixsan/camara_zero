@@ -4,6 +4,7 @@ const io = require("socket.io-client");
 const encrypt = require('socket.io-encrypt');
 const exec = require( 'child_process' ).exec;
 const Gpio = require('onoff').Gpio;
+var SocketIO = require('socket.io-client');
 const sensorPresencia = new Gpio(4, 'in', 'both');
 
 var camara,socket;
@@ -50,7 +51,7 @@ function openServerCentral() {
         serial=stdout.split(':')[1];
         serial=serial.trim();
         console.log('el serial es '+serial);
-        var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
+        var socketCliente = SocketIO('https://socket1.biotechtonic.com/',{
             query: {
             access_token: 'camaron',
             serial:serial,
@@ -87,7 +88,7 @@ function openServerCerebro()
         serial=stdout.split(':')[1];
         serial=serial.trim();
         console.log('el serial es '+serial);
-        var socketCerebro = require('socket.io-client')(config.SERVIDOR,{
+        var socketCerebro = SocketIO(config.SERVIDOR,{
             query: {
             access_token: 'camaron',
             serial:serial,
