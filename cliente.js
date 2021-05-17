@@ -1,6 +1,5 @@
 const { StreamCamera, Codec,Rotation,Flip } = require('pi-camera-connect');
 const io = require("socket.io-client");
-const {getSerialNumber} = require('raspi-serial-number');
 
 var camara,socket;
 var hayPresencia=false;
@@ -30,14 +29,15 @@ function broadcastFrame(data,socket) {
     
 };
 function openWsServer() {
-    getSerialNumber((error,data) => {
-        if(error)
-        {
-            console.error("Callback error: ",error);
-        }
-        else
-        {
-            serial=data;
+        exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
+            if(error){
+                console.error( `exec error: ${error}` );
+                return;
+            }
+            //global.logger.info( `stdout: ${stdout}` );
+            var serial=stdout.split(':')[1];
+            serial=serial.trim();
+            console.log('el serial es '+serial);
             var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
                 query: {
                 access_token: 'camaron',
@@ -59,7 +59,6 @@ function openWsServer() {
             socketCliente.on('disconnect', function(){
             console.log('me he desoncectado');
             });
-        }
         return socketCliente;
     });
         
