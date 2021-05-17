@@ -163,7 +163,7 @@ sensorPresencia.watch((err, value) => {
                     console.log('grabo video');
                     hayPresencia=true;
                     nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
-                    startCamera(socket);
+                    camara=startCamera(socket);
                 }
             }
             anterior=1;
