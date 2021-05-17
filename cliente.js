@@ -1,21 +1,32 @@
 const { StreamCamera, Codec,Rotation,Flip } = require('pi-camera-connect');
 const io = require("socket.io-client");
-function broadcastFrame(data,socket) {
-    // if (wsHandle) {
-    //     wsHandle.clients.forEach(ws => {
-    //         if (ws.readyState === WebSocket.OPEN) {
-    //             // we sending frame (jpeg image) as Buffer in binary mode
-    //             ws.send(data, {binary: true});
-    //         }
-    //     });
-    // }
-    
-    socket.emit('imagen',{
-        frame:data,
-        camera:'dsdsdsds',
-        video:'abc'
 
-    })
+var camara,socket;
+var hayPresencia=false;
+var serial;
+
+
+
+function broadcastFrame(data,socket) {
+    if(hayPresencia==true)
+    {
+        socket.emit('imagenPresencia',{
+            frame:data,
+            camera:serial,
+            video:'abc'
+    
+        });
+    }
+    else
+    {
+        socket.emit('imagenLive',{
+            frame:data,
+            camera:serial,
+            video:'abc'
+    
+        });
+    }
+    
 };
 function openWsServer() {
     getSerialNumber((error,data) => {
@@ -25,22 +36,27 @@ function openWsServer() {
         }
         else
         {
+            serial=data;
             var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
                 query: {
                 access_token: 'camaron',
-                camera:true,
-                serial:data
+                serial:serial,
+                camera:true
                 }
             });
 
             socketCliente.on('connect', function(){
-                console.log('conectado')
+            console.log('conectado')
             });
 
-            socketCliente.on('event', function(data){});
-
+            socketCliente.on('paraCamara', function(data){
+                stopCamera(camara);
+            });
+            socketCliente.on('startLive', function(data){
+                camara=startCamera(socketCliente);
+            });
             socketCliente.on('disconnect', function(){
-                console.log('me he desoncectado');
+            console.log('me he desoncectado');
             });
         }
         return socketCliente;
@@ -49,9 +65,10 @@ function openWsServer() {
     
 };
 function startCamera(socket) {
+    //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
-        fps: 2,
+        fps: 3,
         width: 640,
         height: 480,
         // increase this to reduce compression artefacts
@@ -76,39 +93,6 @@ function startCamera(socket) {
 function stopCamera(streamCamera) {
     streamCamera.stopCapture();
 }
-// var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
-//         query: {
-//           access_token: 'camaron',
-//           serial:data
-//         }
-//       });
 
-//       socketCliente.on('connect', function(){
-//         console.log('conectado')
-//       });
-
-//       socketCliente.on('event', function(data){});
-
-//       socketCliente.on('disconnect', function(){
-//         console.log('me he desoncectado');
-//       });
-//var socketCliente = openWsServer();
-var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
-        query: {
-          access_token: 'camaron',
-          serial:'100000009c73d022'
-        }
-});
-
-socketCliente.on('connect', function(){
-console.log('conectado')
-});
-
-socketCliente.on('paraCamara', function(data){
-
-});
-
-socketCliente.on('disconnect', function(){
-console.log('me he desoncectado');
-});
-var streamCamera=startCamera(socketCliente);
+//var streamCamera=startCamera(socketCliente);
+socket=openWsServer();
