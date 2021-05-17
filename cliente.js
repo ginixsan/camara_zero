@@ -34,8 +34,7 @@ function broadcastFrame(data,socket,nombreVideo=null) {
     {
         socket.emit('imagenLive',{
             frame:data,
-            camera:serial,
-            video:'abc'
+            camera:serial
     
         });
     }
