@@ -1,11 +1,20 @@
+var config = require('./config');
 const { StreamCamera, Codec,Rotation,Flip } = require('pi-camera-connect');
 const io = require("socket.io-client");
+const encrypt = require('socket.io-encrypt');
 const exec = require( 'child_process' ).exec;
+const Gpio = require('onoff').Gpio;
+const sensorPresencia = new Gpio(4, 'in', 'both');
 
 var camara,socket;
 var hayPresencia=false;
 var serial;
-
+let cameraInUse = false;
+var anterior=0;
+let deteccionMientras=false;
+let parando=false;
+let timer;
+let nombreVideo;
 
 
 function broadcastFrame(data,socket) {
@@ -29,43 +38,72 @@ function broadcastFrame(data,socket) {
     }
     
 };
-function openWsServer() {
-        exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
-            if(error){
-                console.error( `exec error: ${error}` );
-                return;
+function openServerCentral() {
+    exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
+        if(error){
+            console.error( `exec error: ${error}` );
+            return;
+        }
+        //global.logger.info( `stdout: ${stdout}` );
+        serial=stdout.split(':')[1];
+        serial=serial.trim();
+        console.log('el serial es '+serial);
+        var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
+            query: {
+            access_token: 'camaron',
+            serial:serial,
+            camera:true
             }
-            //global.logger.info( `stdout: ${stdout}` );
-            serial=stdout.split(':')[1];
-            serial=serial.trim();
-            console.log('el serial es '+serial);
-            var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
-                query: {
-                access_token: 'camaron',
-                serial:serial,
-                camera:true
-                }
-            });
+        });
 
-            socketCliente.on('connect', function(){
-            console.log('conectado')
-            });
+        socketCliente.on('connect', function(){
+        console.log('conectado')
+        });
 
-            socketCliente.on('stopLive', function(data){
-                stopCamera(camara);
+        socketCliente.on('stopLive', function(data){
+            stopCamera(camara);
+        });
+        socketCliente.on('startLive', function(data){
+            camara=startCamera(socketCliente);
+        });
+        socketCliente.on('disconnect', function(){
+            console.log('me he desoncectado');
+            stopCamera(camara);
             });
-            socketCliente.on('startLive', function(data){
-                camara=startCamera(socketCliente);
-            });
-            socketCliente.on('disconnect', function(){
-                console.log('me he desoncectado');
-                stopCamera(camara);
-                });
-        return socketCliente;
-    });
+    return socketCliente;
+});
         
     
 };
+function openServerCerebro()
+{
+    exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
+        if(error){
+            console.error( `exec error: ${error}` );
+            return;
+        }
+        serial=stdout.split(':')[1];
+        serial=serial.trim();
+        console.log('el serial es '+serial);
+        var socketCerebro = require('socket.io-client')(config.SERVIDOR,{
+            query: {
+            access_token: 'camaron',
+            serial:serial,
+            camera:true
+            }
+        });
+        encrypt('secreto')(socketCerebro);
+        socketCerebro.on('connect', function(){
+            console.log('conectado')
+        });
+
+        socketCerebro.on('disconnect', function(){
+            console.log('me he desoncectado');
+            stopCamera(camara);
+        });
+        return socketCerebro;
+    }); 
+}
 function startCamera(socket) {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
@@ -97,4 +135,44 @@ function stopCamera(streamCamera) {
 }
 
 //var streamCamera=startCamera(socketCliente);
-socket=openWsServer();
+socket=openServerCentral();
+var socketCerebro=openServerCerebro();
+sensorPresencia.watch((err, value) => {
+    if (err) {
+        throw err;
+    }
+    if(value==1)
+    {
+        if(anterior==0)
+        {
+            if(parando==true)
+            {
+                deteccionMientras=true;
+            }
+            else
+            {
+                if(cameraInUse==false)
+                {
+                    console.log('hay alguien');
+                    console.log('grabo video');
+                    nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
+                    
+                }
+            }
+            anterior=1;
+        }
+    }
+    else
+    {
+        console.log('no hay nadie');
+        if(cameraInUse==true)
+        {
+        parando=true;
+        timer=setTimeout(paraGrabacion,15000);
+        }
+        if(anterior==1)
+        {
+            anterior=0;
+        }
+    }
+});
