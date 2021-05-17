@@ -51,7 +51,7 @@ function openWsServer() {
             console.log('conectado')
             });
 
-            socketCliente.on('paraCamara', function(data){
+            socketCliente.on('stopLive', function(data){
                 stopCamera(camara);
             });
             socketCliente.on('startLive', function(data){
