@@ -102,7 +102,6 @@ function openServerCerebro()
 
         socketCerebro.on('disconnect', function(){
             console.log('me he desoncectado');
-            stopCamera(camara);
         });
         return socketCerebro;
     }); 
