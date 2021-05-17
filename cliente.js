@@ -1,5 +1,6 @@
 const { StreamCamera, Codec,Rotation,Flip } = require('pi-camera-connect');
 const io = require("socket.io-client");
+const {getSerialNumber} = require('raspi-serial-number');
 
 var camara,socket;
 var hayPresencia=false;
