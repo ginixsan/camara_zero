@@ -36,7 +36,7 @@ function openWsServer() {
                 return;
             }
             //global.logger.info( `stdout: ${stdout}` );
-            var serial=stdout.split(':')[1];
+            serial=stdout.split(':')[1];
             serial=serial.trim();
             console.log('el serial es '+serial);
             var socketCliente = require('socket.io-client')('https://socket1.biotechtonic.com/',{
