@@ -58,8 +58,9 @@ function openWsServer() {
                 camara=startCamera(socketCliente);
             });
             socketCliente.on('disconnect', function(){
-            console.log('me he desoncectado');
-            });
+                console.log('me he desoncectado');
+                stopCamera(camara);
+                });
         return socketCliente;
     });
         
