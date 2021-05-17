@@ -137,7 +137,32 @@ function startCamera(socket) {
     return streamCamera;
 }
 function stopCamera(streamCamera) {
-    streamCamera.stopCapture();
+    //streamCamera.stopCapture();
+    if(hayPresencia==true)
+    {
+        if(deteccionMientras==false)
+        {
+            console.log('paro el video');
+            streamCamera.stopCapture().then(() => {
+                cameraInUse=false;
+                deteccionMientras=false;
+                parando=false;
+                hayPresencia=false;
+            });
+        }
+        else
+        {
+            console.log('no paro el video porque aun hay alguien');
+            deteccionMientras=false;
+            clearTimeout(timer);
+            timer=setTimeout(paraGrabacion,15000);
+        }
+    }
+    else
+    {
+        streamCamera.stopCapture(); 
+    }
+    
 }
 
 //var streamCamera=startCamera(socketCliente);
@@ -149,6 +174,7 @@ sensorPresencia.watch((err, value) => {
     }
     if(value==1)
     {
+        hayPresencia=true;
         if(anterior==0)
         {
             if(parando==true)
@@ -161,7 +187,6 @@ sensorPresencia.watch((err, value) => {
                 {
                     console.log('hay alguien');
                     console.log('grabo video');
-                    hayPresencia=true;
                     nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
                     camara=startCamera(socket);
                 }
