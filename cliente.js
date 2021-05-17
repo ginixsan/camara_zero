@@ -17,14 +17,17 @@ let timer;
 let nombreVideo;
 
 
-function broadcastFrame(data,socket) {
+function broadcastFrame(data,socket,nombreVideo=null) {
     if(hayPresencia==true)
     {
         socket.emit('imagenPresencia',{
             frame:data,
             camera:serial,
-            video:'abc'
-    
+            video:nombreVideo
+        });
+        socketCerebro.emit('presenciaFrame',{
+            frame:data,
+            serial:serial
         });
     }
     else
@@ -126,7 +129,11 @@ function startCamera(socket) {
         // you can add some processing to frame data here
         // e.g let Mat = cv.imdecode(data)
         console.log('tengo frame');
-        broadcastFrame(data,socket);
+        if(hayPresencia==false)
+        {
+            nombreVideo=null;
+        }
+        broadcastFrame(data,socket,nombreVideo);
     });
     return streamCamera;
 }
@@ -155,8 +162,9 @@ sensorPresencia.watch((err, value) => {
                 {
                     console.log('hay alguien');
                     console.log('grabo video');
+                    hayPresencia=true;
                     nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
-                    
+                    startCamera(socket);
                 }
             }
             anterior=1;
@@ -167,8 +175,8 @@ sensorPresencia.watch((err, value) => {
         console.log('no hay nadie');
         if(cameraInUse==true)
         {
-        parando=true;
-        timer=setTimeout(paraGrabacion,15000);
+            parando=true;
+            timer=setTimeout(stopCamera(camara),15000);
         }
         if(anterior==1)
         {
