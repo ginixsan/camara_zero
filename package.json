@@ -2,7 +2,7 @@
   "name": "rpistreaming",
   "version": "1.0.0",
   "description": "MJPEG streaming demo for RPi camera",
-  "main": "server.js",
+  "main": "cliente.js",
   "scripts": {
     "dev": "NODE_ENV=development /usr/bin/node cliente.js",
     "prod": "NODE_ENV=production /usr/bin/node cliente.js",
