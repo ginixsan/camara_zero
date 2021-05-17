@@ -21,7 +21,7 @@ function openWsServer() {
     getSerialNumber((error,data) => {
         if(error)
         {
-          console.error("Callback error: ",error);
+            console.error("Callback error: ",error);
         }
         else
         {
@@ -43,7 +43,10 @@ function openWsServer() {
                 console.log('me he desoncectado');
             });
         }
-    return socketCliente;
+        return socketCliente;
+    });
+        
+    
 };
 function startCamera(socket) {
     const streamCamera = new StreamCamera({
