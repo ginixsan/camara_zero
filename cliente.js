@@ -70,7 +70,7 @@ function startCamera(socket) {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
-        fps: 3,
+        fps: 2,
         width: 640,
         height: 480,
         // increase this to reduce compression artefacts
