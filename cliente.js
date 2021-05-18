@@ -129,21 +129,7 @@ async function stopCamera(streamCamera) {
             clearTimeout(timer);
             timer=setTimeout(function(){
                 (async () =>{
-                    paraSensor(sensorPresencia,function(){
-                        streamCamera.stopCapture().then(() => {
-                            cameraInUse=false;
-                            deteccionMientras=false;
-                            parando=false;
-                            hayPresencia=false;
-                            presencia=false;
-                            socketCentral.emit('finVideo',{
-                                video:nombreVideo,
-                                serial:serial
-                            })
-                            contadorImagen=0;
-                            arrancaSensor(sensorPresencia);
-                        });
-                    });
+                        await stopCamera(camara);
                 })();
             },15000);
         }
