@@ -1,7 +1,7 @@
 {
-  "name": "rpistreaming",
+  "name": "camarazero",
   "version": "1.0.0",
-  "description": "MJPEG streaming demo for RPi camera",
+  "description": "camara apartamentos",
   "main": "cliente.js",
   "scripts": {
     "dev": "NODE_ENV=development /usr/bin/node cliente.js",
@@ -10,17 +10,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ATAMAH/rpistreaming.git"
+    "url": "git+https://github.com/ginixsan/camara_zero.git"
   },
   "keywords": [
     "raspberry"
   ],
-  "author": "Dmitry Novikov",
+  "author": "Gines Sanz Sanchis",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/ATAMAH/rpistreaming/issues"
+    "url": "https://github.com/ginixsan/camara_zero.git"
   },
-  "homepage": "https://github.com/ATAMAH/rpistreaming#readme",
+  "homepage": "https://github.com/ginixsan/camara_zero.git#readme",
   "dependencies": {
     "dotenv": "^9.0.2",
     "errorhandler": "^1.5.1",
