@@ -26,7 +26,7 @@ let contadorImagen=0;
 
 
 function saltaFrames(value) {
-	if (value%6 == 0||(value<6 && value%2==0)||value==0)
+	if (value%6== 0||(value<6 && value%2==0)||value==0)
 		return true;
 	else
 		return false;
@@ -131,7 +131,7 @@ async function stopCamera(streamCamera) {
                 (async () =>{
                         await stopCamera(camara);
                 })();
-            },15000);
+            },8000);
         }
     }
     else
@@ -269,7 +269,7 @@ function arrancaSensor(sensor)
                     (async () =>{
                         await stopCamera(camara);
                     })();
-                },15000);
+                },8000);
             }
             else
             {
