@@ -139,7 +139,8 @@ function startCamera(nombreVideo) {
         {
             nombreVideo=null;
         }
-        broadcastFrame(data,nombreVideo);
+        console.log(socketCerebro);
+        broadcastFrame(data);
     });
     return streamCamera;
 }
