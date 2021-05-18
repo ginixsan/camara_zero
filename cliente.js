@@ -39,7 +39,8 @@ function broadcastFrame(data,nombreVideo=null) {
             frame:data,
             camera:serial,
             video:nombreVideo,
-            contador:contadorImagen
+            contador:contadorImagen,
+            presencia:true
         });
         contadorImagen++;
         if(saltaFrames(contadorImagen))
