@@ -10,7 +10,9 @@ const sensorPresencia = new Gpio(26, 'in', 'both',{
     debounceTimeout:3000
 });
 
-var camara,socket;
+var camara;
+var socket;
+var socketCerebro;
 var hayPresencia=false;
 var serial;
 let cameraInUse = false;
@@ -111,7 +113,7 @@ function openServerCerebro()
         return socketCerebro;
     }); 
 }
-function startCamera(socket) {
+function startCamera(socket1,socket2) {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
@@ -137,7 +139,7 @@ function startCamera(socket) {
         {
             nombreVideo=null;
         }
-        broadcastFrame(data,socket,nombreVideo);
+        broadcastFrame(data,socket1,socket2,nombreVideo);
     });
     return streamCamera;
 }
@@ -176,8 +178,7 @@ function stopCamera(streamCamera) {
 }
 
 //var streamCamera=startCamera(socketCliente);
-socket=openServerCentral();
-var socketCerebro=openServerCerebro();
+
 sensorPresencia.watch((err, value) => {
     if (err) {
         throw err;
@@ -198,7 +199,7 @@ sensorPresencia.watch((err, value) => {
                     console.log('hay alguien');
                     console.log('grabo video');
                     nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
-                    camara=startCamera(socket);
+                    camara=startCamera(socket,socketCerebro,nombreVideo);
                 }
             }
             anterior=1;
@@ -218,6 +219,5 @@ sensorPresencia.watch((err, value) => {
         }
     }
 });
-process.on('SIGINT', _ => {
-    sensorPresencia.unexport();
-  });
+socket=openServerCentral();
+socketCerebro=openServerCerebro();
