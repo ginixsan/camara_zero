@@ -23,6 +23,15 @@ let timer;
 let nombreVideo;
 let contadorImagen=0;
 
+
+function saltaFrames(value) {
+	if (value%4 == 0)
+		return true;
+	else
+		return false;
+}
+
+
 function broadcastFrame(data,nombreVideo=null,socket1,socket2=null) {
     if(hayPresencia==true)
     {
@@ -33,10 +42,14 @@ function broadcastFrame(data,nombreVideo=null,socket1,socket2=null) {
             contador:contadorImagen
         });
         contadorImagen++;
-        socketCerebro.emit('presenciaFrame',{
-            frame:data,
-            serial:serial
-        });
+        if(saltaFrames(contadorImagen))
+        {
+            socketCerebro.emit('presenciaFrame',{
+                frame:data,
+                serial:serial
+            });
+        }
+        
     }
     else
     {
@@ -71,7 +84,7 @@ function startCamera(socket1,socket2=null,nombreVideo=null) {
     streamCamera.on('frame', data => {
         // you can add some processing to frame data here
         // e.g let Mat = cv.imdecode(data)
-        console.log('tengo frame');
+        //console.log('tengo frame');
         if(hayPresencia==false)
         {
             nombreVideo=null;
