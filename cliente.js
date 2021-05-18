@@ -41,14 +41,14 @@ function broadcastFrame(data,nombreVideo=null) {
             video:nombreVideo,
             contador:contadorImagen
         });
-        // contadorImagen++;
-        // if(saltaFrames(contadorImagen))
-        // {
-        //     socketCerebro.emit('presenciaFrame',{
-        //         frame:data,
-        //         serial:serial
-        //     });
-        // }
+        contadorImagen++;
+        if(saltaFrames(contadorImagen))
+        {
+            socketCerebro.emit('presenciaFrame',{
+                frame:data,
+                serial:serial
+            });
+        }
         
     }
     else
