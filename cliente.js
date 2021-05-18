@@ -106,7 +106,7 @@ async function stopCamera(streamCamera) {
         {
             console.log('paro el video');
             (async () =>{
-                paraSensor(sensorPresencia,function(){
+                sensorPresencia.unwatch(function(){
                     streamCamera.stopCapture().then(() => {
                         cameraInUse=false;
                         deteccionMientras=false;
@@ -137,7 +137,7 @@ async function stopCamera(streamCamera) {
     else
     {
         (async () =>{
-            paraSensor(sensorPresencia,function(){
+            sensorPresencia.unwatch(function(){
                 streamCamera.stopCapture().then(() => {
                     cameraInUse=false;
                     deteccionMientras=false;
@@ -284,12 +284,6 @@ function arrancaSensor(sensor)
     });
 }
 
-function paraSensor(sensor,callback)
-{
-    sensor.unwatch(function(){
-        callback();
-    });
-}
 
 (async () =>{
     await openServerCentral();
