@@ -6,7 +6,7 @@ const exec = require( 'child_process' ).exec;
 const Gpio = require('onoff').Gpio;
 var SocketIO = require('socket.io-client');
 const sensorPresencia = new Gpio(26, 'in', 'both',{
-    debounceTimeout:30000
+    debounceTimeout:3000
 });
 
 var camara,socket;
