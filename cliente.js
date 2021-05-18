@@ -14,6 +14,7 @@ var camara;
 var socketCentral;
 var socketCerebro;
 var hayPresencia=false;
+var presencia=false;
 var serial;
 let cameraInUse = false;
 var anterior=0;
@@ -101,7 +102,7 @@ async function stopCamera(streamCamera) {
     //streamCamera.stopCapture();
     if(hayPresencia==true)
     {
-        if(deteccionMientras==false)
+        if(deteccionMientras==false && presencia==false)
         {
             console.log('paro el video');
             (async () =>{
@@ -111,6 +112,7 @@ async function stopCamera(streamCamera) {
                         deteccionMientras=false;
                         parando=false;
                         hayPresencia=false;
+                        presencia=false;
                         socketCentral.emit('finVideo',{
                             video:nombreVideo,
                             serial:serial
@@ -133,6 +135,7 @@ async function stopCamera(streamCamera) {
                             deteccionMientras=false;
                             parando=false;
                             hayPresencia=false;
+                            presencia=false;
                             socketCentral.emit('finVideo',{
                                 video:nombreVideo,
                                 serial:serial
@@ -155,6 +158,7 @@ async function stopCamera(streamCamera) {
                     parando=false;
                     hayPresencia=false;
                     contadorImagen=0;
+                    presencia=false;
                     arrancaSensor(sensorPresencia);
                 });
             });
@@ -242,6 +246,7 @@ function arrancaSensor(sensor)
         }
         if(value==1)
         {
+            presencia=true;
             //hay presencia
             if(cameraInUse==false)
             {
@@ -249,25 +254,30 @@ function arrancaSensor(sensor)
                     console.log('hay alguien');
                     console.log('grabo video');
                     hayPresencia=true;
+                    parando=false;
+                    deteccionMientras=false;
                     nombreVideo=serial+'_'+moment().format("DD_MM_YYYY_HH_mm_ss_SSS");
                     camara=await startCamera(nombreVideo);
                 })();
             }
             else
             {
-                console.log('ya esta grabando por lo que no hago nada?');
-                if(parando==true)
+                console.log('ya esta grabando');
+                if(parando==true && deteccionMientras==false)
                 {
+                    console.log('esta parando y no habia detectado a nadie.pongo deteccionMient a true');
                     deteccionMientras=true;
                 }
             }
         }
         else
         {
+            presencia=false;
             //deja de haber presencia
             console.log('no hay nadie');
             if(cameraInUse==true&&parando==false)
             {
+                console.log('ya esta grabando y no estaba parando. pongo parando y pongo timeout');
                 parando=true;
                 timer=setTimeout(function(){
                     (async () =>{
@@ -277,8 +287,10 @@ function arrancaSensor(sensor)
             }
             else
             {
-                if(parando==true)
+                
+                if(parando==true && cameraInUse==true)
                 {
+                    console.log('ya esta grabando y ya esta parando. pongo deteccion mientras a false');
                     deteccionMientras=false;
                 }
             }
