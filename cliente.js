@@ -25,7 +25,7 @@ let contadorImagen=0;
 
 
 function saltaFrames(value) {
-	if (value%4 == 0)
+	if (value%6 == 0)
 		return true;
 	else
 		return false;
@@ -265,7 +265,7 @@ function arrancaSensor(sensor)
         {
             //deja de haber presencia
             console.log('no hay nadie');
-            if(cameraInUse==true)
+            if(cameraInUse==true&&parando==false)
             {
                 parando=true;
                 timer=setTimeout(function(){
