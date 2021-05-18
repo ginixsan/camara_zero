@@ -79,7 +79,6 @@ function startCamera(socket1,socket2=null,nombreVideo=null) {
         }
         else
         {
-            console.log(socketCerebro);
             broadcastFrame(data,nombreVideo,socket1,socket2);
         }
         
