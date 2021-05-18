@@ -18,7 +18,7 @@ let deteccionMientras=false;
 let parando=false;
 let timer;
 let nombreVideo;
-
+let contadorImagen=0;
 
 function broadcastFrame(data,socket,nombreVideo=null) {
     if(hayPresencia==true)
@@ -26,8 +26,10 @@ function broadcastFrame(data,socket,nombreVideo=null) {
         socket.emit('imagenPresencia',{
             frame:data,
             camera:serial,
-            video:nombreVideo
+            video:nombreVideo,
+            contador:contadorImagen
         });
+        contadorImagen++;
         socketCerebro.emit('presenciaFrame',{
             frame:data,
             serial:serial
@@ -151,8 +153,10 @@ function stopCamera(streamCamera) {
                 parando=false;
                 hayPresencia=false;
                 socket.emit('finVideo',{
-                    video:nombreVideo
+                    video:nombreVideo,
+                    serial:serial
                 })
+                contadorImagen=0;
             });
         }
         else
