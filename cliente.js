@@ -5,7 +5,9 @@ const encrypt = require('socket.io-encrypt');
 const exec = require( 'child_process' ).exec;
 const Gpio = require('onoff').Gpio;
 var SocketIO = require('socket.io-client');
-const sensorPresencia = new Gpio(4, 'in', 'both');
+const sensorPresencia = new Gpio(26, 'in', 'both',{
+    debounceTimeout:30000
+});
 
 var camara,socket;
 var hayPresencia=false;
@@ -208,3 +210,6 @@ sensorPresencia.watch((err, value) => {
         }
     }
 });
+process.on('SIGINT', _ => {
+    sensorPresencia.unexport();
+  });
