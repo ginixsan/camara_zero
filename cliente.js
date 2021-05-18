@@ -7,7 +7,7 @@ const moment=require('moment');
 const Gpio = require('onoff').Gpio;
 var SocketIO = require('socket.io-client');
 const sensorPresencia = new Gpio(26, 'in', 'both',{
-    debounceTimeout:3000
+    debounceTimeout:1500
 });
 
 var camara;
@@ -23,7 +23,7 @@ let timer;
 let nombreVideo;
 let contadorImagen=0;
 
-function broadcastFrame(data,nombreVideo=null,socket1,socket2) {
+function broadcastFrame(data,nombreVideo=null,socket1,socket2=null) {
     if(hayPresencia==true)
     {
         socket1.emit('imagenPresencia',{
@@ -50,7 +50,7 @@ function broadcastFrame(data,nombreVideo=null,socket1,socket2) {
 };
 
 
-function startCamera(socket1,socket2,nombreVideo=null) {
+function startCamera(socket1,socket2=null,nombreVideo=null) {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
@@ -75,9 +75,14 @@ function startCamera(socket1,socket2,nombreVideo=null) {
         if(hayPresencia==false)
         {
             nombreVideo=null;
+            broadcastFrame(data,nombreVideo,socket1)
         }
-        console.log(socketCerebro);
-        broadcastFrame(data,nombreVideo,socket1,socket2);
+        else
+        {
+            console.log(socketCerebro);
+            broadcastFrame(data,nombreVideo,socket1,socket2);
+        }
+        
     });
     return streamCamera;
 }
@@ -141,7 +146,7 @@ async function openServerCentral() {
             stopCamera(camara);
         });
         socketCliente.on('startLive', function(data){
-            camara=startCamera(socketCliente,socketCerebro);
+            camara=startCamera(socketCliente);
         });
         socketCliente.on('disconnect', function(){
             console.log('me he desoncectado');
@@ -185,8 +190,8 @@ async function openServerCerebro()
 //var streamCamera=startCamera(socketCliente);
 
 (async () =>{
-    socketCentral=openServerCentral();
-    socketCerebro=openServerCerebro();
+    socketCentral=await openServerCentral();
+    socketCerebro=await openServerCerebro();
     sensorPresencia.watch((err, value) => {
         if (err) {
             throw err;
