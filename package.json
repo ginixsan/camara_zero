@@ -4,8 +4,8 @@
   "description": "camara apartamentos",
   "main": "cliente.js",
   "scripts": {
-    "dev": "NODE_ENV=development /usr/bin/node cliente.js",
-    "prod": "NODE_ENV=production /usr/bin/node cliente.js",
+    "dev": "sudo NODE_ENV=development /usr/bin/node cliente.js",
+    "prod": "sudo NODE_ENV=production /usr/bin/node cliente.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -30,6 +30,7 @@
     "morgan": "^1.10.0",
     "onoff": "^6.0.3",
     "pi-camera-connect": "^0.3.4",
+    "pigpio": "^3.3.1",
     "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2",
     "socket.io-encrypt": "^0.2.1"

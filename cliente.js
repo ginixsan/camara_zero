@@ -4,11 +4,10 @@ const io = require("socket.io-client");
 const encrypt = require('socket.io-encrypt');
 const exec = require( 'child_process' ).exec;
 const moment=require('moment');
-const Gpio = require('onoff').Gpio;
+const Gpio = require('pigpio').Gpio;
 var SocketIO = require('socket.io-client');
-const sensorPresencia = new Gpio(26, 'in', 'both',{
-    debounceTimeout:1500
-});
+var sensorPresencia = new Gpio(26, {mode: Gpio.INPUT, alert: true});
+
 
 var camara;
 var socketCentral;
@@ -106,7 +105,7 @@ async function stopCamera(streamCamera) {
         {
             console.log('paro el video');
             (async () =>{
-                sensorPresencia.unwatch(function(){
+                    sensorPresencia.disableAlert();
                     console.log('quitado sensor');
                     streamCamera.stopCapture().then(() => {
                         cameraInUse=false;
@@ -119,9 +118,8 @@ async function stopCamera(streamCamera) {
                             serial:serial
                         });
                         contadorImagen=0;
-                        arrancaSensor(sensorPresencia);
+                        sensorPresencia.enableAlert();
                     });
-                });
             })();
         }
         else
@@ -139,7 +137,7 @@ async function stopCamera(streamCamera) {
     else
     {
         (async () =>{
-            sensorPresencia.unwatch(function(){
+                sensorPresencia.disableAlert();
                 console.log('quitado sensor');
                 streamCamera.stopCapture().then(() => {
                     cameraInUse=false;
@@ -148,9 +146,8 @@ async function stopCamera(streamCamera) {
                     hayPresencia=false;
                     contadorImagen=0;
                     presencia=false;
-                    arrancaSensor(sensorPresencia);
+                    sensorPresencia.enableAlert();
                 });
-            });
             
         })(); 
     }
@@ -229,11 +226,9 @@ async function openServerCerebro()
 //var streamCamera=startCamera(socketCliente);
 function arrancaSensor(sensor)
 {
-    sensor.watch((err, value) => {
-        if (err) {
-            throw err;
-        }
-        if(value==1)
+    sensor.glitchFilter(300000);
+    sensor.on('alert', (level, tick) => {
+        if(level==1)
         {
             presencia=true;
             //hay presencia
