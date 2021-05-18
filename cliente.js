@@ -107,6 +107,7 @@ async function stopCamera(streamCamera) {
             console.log('paro el video');
             (async () =>{
                 sensorPresencia.unwatch(function(){
+                    console.log('quitado sensor');
                     streamCamera.stopCapture().then(() => {
                         cameraInUse=false;
                         deteccionMientras=false;
@@ -118,6 +119,7 @@ async function stopCamera(streamCamera) {
                             serial:serial
                         });
                         contadorImagen=0;
+                        arrancaSensor(sensorPresencia);
                     });
                 });
             })();
@@ -138,6 +140,7 @@ async function stopCamera(streamCamera) {
     {
         (async () =>{
             sensorPresencia.unwatch(function(){
+                console.log('quitado sensor');
                 streamCamera.stopCapture().then(() => {
                     cameraInUse=false;
                     deteccionMientras=false;
