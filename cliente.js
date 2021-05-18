@@ -150,6 +150,9 @@ function stopCamera(streamCamera) {
                 deteccionMientras=false;
                 parando=false;
                 hayPresencia=false;
+                socket.emit('finvideo',{
+                    video:nombreVideo
+                })
             });
         }
         else
