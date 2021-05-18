@@ -139,7 +139,7 @@ function startCamera(socket1,socket2) {
         {
             nombreVideo=null;
         }
-        broadcastFrame(data,socket1,socket2,nombreVideo);
+        broadcastFrame(data,socket,socketCerebro,nombreVideo);
     });
     return streamCamera;
 }
