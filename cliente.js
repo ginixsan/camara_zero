@@ -25,7 +25,7 @@ let contadorImagen=0;
 
 
 function saltaFrames(value) {
-	if (value%6 == 0)
+	if (value%6 == 0||(value<6 && value%2)||value==0)
 		return true;
 	else
 		return false;
