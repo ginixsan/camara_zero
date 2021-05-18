@@ -140,6 +140,7 @@ async function openServerCentral() {
 
         socketCliente.on('connect', function(){
             console.log('conectado central');
+            socketCentral=socketCliente;
         });
 
         socketCliente.on('stopLive', function(data){
@@ -177,6 +178,7 @@ async function openServerCerebro()
         encrypt('secreto')(socket1);
         socket1.on('connect', function(){
             console.log('conectado cerebro')
+            socketCerebro=socket1;
         });
 
         socket1.on('disconnect', function(){
@@ -190,8 +192,8 @@ async function openServerCerebro()
 //var streamCamera=startCamera(socketCliente);
 
 (async () =>{
-    socketCentral=await openServerCentral();
-    socketCerebro=await openServerCerebro();
+    await openServerCentral();
+    await openServerCerebro();
     // sensorPresencia.watch((err, value) => {
     //     if (err) {
     //         throw err;
