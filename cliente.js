@@ -50,7 +50,7 @@ function broadcastFrame(data,nombreVideo=null,socket1,socket2) {
 };
 
 
-function startCamera(socket1,socket2.nombreVideo=null) {
+function startCamera(socket1,socket2,nombreVideo=null) {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
