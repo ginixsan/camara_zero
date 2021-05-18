@@ -23,137 +23,24 @@ let timer;
 let nombreVideo;
 let contadorImagen=0;
 
-
-function openServerCentral() {
-    exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
-        if(error){
-            console.error( `exec error: ${error}` );
-            return;
-        }
-        //global.logger.info( `stdout: ${stdout}` );
-        serial=stdout.split(':')[1];
-        serial=serial.trim();
-        console.log('el serial es '+serial);
-        var socketCliente = SocketIO('https://socket1.biotechtonic.com/',{
-            query: {
-            access_token: 'camaron',
-            serial:serial,
-            camera:true
-            }
-        });
-
-        socketCliente.on('connect', function(){
-            console.log('conectado central');
-        });
-
-        socketCliente.on('stopLive', function(data){
-            stopCamera(camara);
-        });
-        socketCliente.on('startLive', function(data){
-            camara=startCamera(socketCliente);
-        });
-        socketCliente.on('disconnect', function(){
-            console.log('me he desoncectado');
-            stopCamera(camara);
-        });
-    return socketCliente;
-});
-        
-    
-};
-function openServerCerebro()
-{
-    exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
-        if(error){
-            console.error( `exec error: ${error}` );
-            return;
-        }
-        serial=stdout.split(':')[1];
-        serial=serial.trim();
-        console.log('el serial es '+serial);
-        var socketCerebro = SocketIO(config.SERVIDOR,{
-            query: {
-            access_token: 'camaron',
-            serial:serial,
-            camera:true
-            }
-        });
-        encrypt('secreto')(socketCerebro);
-        socketCerebro.on('connect', function(){
-            console.log('conectado cerebro')
-        });
-
-        socketCerebro.on('disconnect', function(){
-            console.log('me he desoncectado');
-        });
-        return socketCerebro;
-    }); 
-}
-
-
-//var streamCamera=startCamera(socketCliente);
-
-sensorPresencia.watch((err, value) => {
-    if (err) {
-        throw err;
-    }
-    if(value==1)
-    {
-        hayPresencia=true;
-        if(anterior==0)
-        {
-            if(parando==true)
-            {
-                deteccionMientras=true;
-            }
-            else
-            {
-                if(cameraInUse==false)
-                {
-                    console.log('hay alguien');
-                    console.log('grabo video');
-                    nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
-                    camara=startCamera(nombreVideo);
-                }
-            }
-            anterior=1;
-        }
-    }
-    else
-    {
-        console.log('no hay nadie');
-        if(cameraInUse==true)
-        {
-            parando=true;
-            timer=setTimeout(stopCamera(camara),15000);
-        }
-        if(anterior==1)
-        {
-            anterior=0;
-        }
-    }
-});
-socketCentral=openServerCentral();
-socketCerebro=openServerCerebro();
-
-function broadcastFrame(data,nombreVideo=null) {
+function broadcastFrame(data,nombreVideo=null,socket1,socket2) {
     if(hayPresencia==true)
     {
-        socketCentral.emit('imagenPresencia',{
+        socket1.emit('imagenPresencia',{
             frame:data,
             camera:serial,
             video:nombreVideo,
             contador:contadorImagen
         });
         contadorImagen++;
-        socketCerebro.emit('presenciaFrame',{
+        socket2.emit('presenciaFrame',{
             frame:data,
             serial:serial
         });
     }
     else
     {
-        socketCentral.emit('imagenLive',{
+        socket1.emit('imagenLive',{
             frame:data,
             camera:serial
     
@@ -163,7 +50,7 @@ function broadcastFrame(data,nombreVideo=null) {
 };
 
 
-function startCamera(nombreVideo) {
+function startCamera(socket1,socket2.nombreVideo=null) {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
@@ -190,7 +77,7 @@ function startCamera(nombreVideo) {
             nombreVideo=null;
         }
         console.log(socketCerebro);
-        broadcastFrame(data,nombreVideo);
+        broadcastFrame(data,nombreVideo,socket1,socket2);
     });
     return streamCamera;
 }
@@ -227,3 +114,117 @@ function stopCamera(streamCamera) {
     }
     
 }
+
+function openServerCentral() {
+    exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
+        if(error){
+            console.error( `exec error: ${error}` );
+            return;
+        }
+        //global.logger.info( `stdout: ${stdout}` );
+        serial=stdout.split(':')[1];
+        serial=serial.trim();
+        console.log('el serial es '+serial);
+        var socketCliente = SocketIO('https://socket1.biotechtonic.com/',{
+            query: {
+            access_token: 'camaron',
+            serial:serial,
+            camera:true
+            }
+        });
+
+        socketCliente.on('connect', function(){
+            console.log('conectado central');
+        });
+
+        socketCliente.on('stopLive', function(data){
+            stopCamera(camara);
+        });
+        socketCliente.on('startLive', function(data){
+            camara=startCamera(socketCliente,socketCerebro);
+        });
+        socketCliente.on('disconnect', function(){
+            console.log('me he desoncectado');
+            stopCamera(camara);
+        });
+        sensorPresencia.watch((err, value) => {
+            if (err) {
+                throw err;
+            }
+            if(value==1)
+            {
+                hayPresencia=true;
+                if(anterior==0)
+                {
+                    if(parando==true)
+                    {
+                        deteccionMientras=true;
+                    }
+                    else
+                    {
+                        if(cameraInUse==false)
+                        {
+                            console.log('hay alguien');
+                            console.log('grabo video');
+                            nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
+                            camara=startCamera(socketCliente,socketCerebro,nombreVideo);
+                        }
+                    }
+                    anterior=1;
+                }
+            }
+            else
+            {
+                console.log('no hay nadie');
+                if(cameraInUse==true)
+                {
+                    parando=true;
+                    timer=setTimeout(stopCamera(camara),15000);
+                }
+                if(anterior==1)
+                {
+                    anterior=0;
+                }
+            }
+        });
+    return socketCliente;
+});
+        
+    
+};
+function openServerCerebro()
+{
+    exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
+        if(error){
+            console.error( `exec error: ${error}` );
+            return;
+        }
+        serial=stdout.split(':')[1];
+        serial=serial.trim();
+        console.log('el serial es '+serial);
+        var socket1 = SocketIO(config.SERVIDOR,{
+            query: {
+            access_token: 'camaron',
+            serial:serial,
+            camera:true
+            }
+        });
+        encrypt('secreto')(socket1);
+        socket1.on('connect', function(){
+            console.log('conectado cerebro')
+        });
+
+        socket1.on('disconnect', function(){
+            console.log('me he desoncectado');
+        });
+        return socket1;
+    }); 
+}
+
+
+//var streamCamera=startCamera(socketCliente);
+
+
+socketCentral=openServerCentral();
+socketCerebro=openServerCerebro();
+
