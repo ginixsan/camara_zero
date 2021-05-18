@@ -115,7 +115,7 @@ function stopCamera(streamCamera) {
     
 }
 
-function openServerCentral() {
+async function openServerCentral() {
     exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
         if(error){
             console.error( `exec error: ${error}` );
@@ -147,52 +147,12 @@ function openServerCentral() {
             console.log('me he desoncectado');
             stopCamera(camara);
         });
-        sensorPresencia.watch((err, value) => {
-            if (err) {
-                throw err;
-            }
-            if(value==1)
-            {
-                hayPresencia=true;
-                if(anterior==0)
-                {
-                    if(parando==true)
-                    {
-                        deteccionMientras=true;
-                    }
-                    else
-                    {
-                        if(cameraInUse==false)
-                        {
-                            console.log('hay alguien');
-                            console.log('grabo video');
-                            nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
-                            camara=startCamera(socketCliente,socketCerebro,nombreVideo);
-                        }
-                    }
-                    anterior=1;
-                }
-            }
-            else
-            {
-                console.log('no hay nadie');
-                if(cameraInUse==true)
-                {
-                    parando=true;
-                    timer=setTimeout(stopCamera(camara),15000);
-                }
-                if(anterior==1)
-                {
-                    anterior=0;
-                }
-            }
-        });
     return socketCliente;
 });
         
     
 };
-function openServerCerebro()
+async function openServerCerebro()
 {
     exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
         if(error){
@@ -224,7 +184,48 @@ function openServerCerebro()
 
 //var streamCamera=startCamera(socketCliente);
 
-
-socketCentral=openServerCentral();
-socketCerebro=openServerCerebro();
+(async () =>{
+    socketCentral=openServerCentral();
+    socketCerebro=openServerCerebro();
+    sensorPresencia.watch((err, value) => {
+        if (err) {
+            throw err;
+        }
+        if(value==1)
+        {
+            hayPresencia=true;
+            if(anterior==0)
+            {
+                if(parando==true)
+                {
+                    deteccionMientras=true;
+                }
+                else
+                {
+                    if(cameraInUse==false)
+                    {
+                        console.log('hay alguien');
+                        console.log('grabo video');
+                        nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
+                        camara=startCamera(socketCentral,socketCerebro,nombreVideo);
+                    }
+                }
+                anterior=1;
+            }
+        }
+        else
+        {
+            console.log('no hay nadie');
+            if(cameraInUse==true)
+            {
+                parando=true;
+                timer=setTimeout(stopCamera(camara),15000);
+            }
+            if(anterior==1)
+            {
+                anterior=0;
+            }
+        }
+    });
+})();
 
