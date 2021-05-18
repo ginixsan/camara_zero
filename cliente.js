@@ -278,7 +278,7 @@ function arrancaSensor(sensor)
             {
                 if(parando==true)
                 {
-                    deteccionMientras=fase;
+                    deteccionMientras=false;
                 }
             }
         }
