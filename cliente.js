@@ -274,6 +274,13 @@ function arrancaSensor(sensor)
                     })();
                 },15000);
             }
+            else
+            {
+                if(parando==true)
+                {
+                    deteccionMientras=fase;
+                }
+            }
         }
     });
 }
