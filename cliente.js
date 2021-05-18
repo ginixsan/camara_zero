@@ -63,7 +63,7 @@ function broadcastFrame(data,nombreVideo=null,socket1,socket2=null) {
 };
 
 
-function startCamera(socket1,socket2=null,nombreVideo=null) {
+async function startCamera(socket1,socket2=null,nombreVideo=null) {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
@@ -74,7 +74,7 @@ function startCamera(socket1,socket2=null,nombreVideo=null) {
         bitRate: 10000000,
         flip:Flip.Both
     });
-    streamCamera.startCapture().then(() => {
+    await streamCamera.startCapture().then(() => {
         console.log(`# Camera started`);
     })
     .catch(e => {
@@ -206,45 +206,45 @@ async function openServerCerebro()
 (async () =>{
     await openServerCentral();
     await openServerCerebro();
-    sensorPresencia.watch((err, value) => {
-        if (err) {
-            throw err;
-        }
-        if(value==1)
-        {
-            hayPresencia=true;
-            if(anterior==0)
-            {
-                if(parando==true)
-                {
-                    deteccionMientras=true;
-                }
-                else
-                {
-                    if(cameraInUse==false)
-                    {
-                        console.log('hay alguien');
-                        console.log('grabo video');
-                        nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
-                        camara=startCamera(socketCentral,socketCerebro,nombreVideo);
-                    }
-                }
-                anterior=1;
-            }
-        }
-        else
-        {
-            console.log('no hay nadie');
-            if(cameraInUse==true)
-            {
-                parando=true;
-                timer=setTimeout(stopCamera(camara),15000);
-            }
-            if(anterior==1)
-            {
-                anterior=0;
-            }
-        }
-    });
+    // sensorPresencia.watch((err, value) => {
+    //     if (err) {
+    //         throw err;
+    //     }
+    //     if(value==1)
+    //     {
+    //         hayPresencia=true;
+    //         if(anterior==0)
+    //         {
+    //             if(parando==true)
+    //             {
+    //                 deteccionMientras=true;
+    //             }
+    //             else
+    //             {
+    //                 if(cameraInUse==false)
+    //                 {
+    //                     console.log('hay alguien');
+    //                     console.log('grabo video');
+    //                     nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
+    //                     camara=startCamera(socketCentral,socketCerebro,nombreVideo);
+    //                 }
+    //             }
+    //             anterior=1;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         console.log('no hay nadie');
+    //         if(cameraInUse==true)
+    //         {
+    //             parando=true;
+    //             timer=setTimeout(stopCamera(camara),15000);
+    //         }
+    //         if(anterior==1)
+    //         {
+    //             anterior=0;
+    //         }
+    //     }
+    // });
 })();
 
