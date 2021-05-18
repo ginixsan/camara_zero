@@ -23,31 +23,7 @@ let timer;
 let nombreVideo;
 let contadorImagen=0;
 
-function broadcastFrame(data,nombreVideo=null) {
-    if(hayPresencia==true)
-    {
-        socketCentral.emit('imagenPresencia',{
-            frame:data,
-            camera:serial,
-            video:nombreVideo,
-            contador:contadorImagen
-        });
-        contadorImagen++;
-        socketCerebro.emit('presenciaFrame',{
-            frame:data,
-            serial:serial
-        });
-    }
-    else
-    {
-        socketCentral.emit('imagenLive',{
-            frame:data,
-            camera:serial
-    
-        });
-    }
-    
-};
+
 function openServerCentral() {
     exec('cat /proc/cpuinfo | grep Serial',(error,stdout,stderr) => {
         if(error){
@@ -113,70 +89,7 @@ function openServerCerebro()
         return socketCerebro;
     }); 
 }
-function startCamera(nombreVideo) {
-    //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
-    const streamCamera = new StreamCamera({
-        codec: Codec.MJPEG,
-        fps: 2,
-        width: 640,
-        height: 480,
-        // increase this to reduce compression artefacts
-        bitRate: 10000000,
-        flip:Flip.Both
-    });
-    streamCamera.startCapture().then(() => {
-        console.log(`# Camera started`);
-    })
-    .catch(e => {
-        console.log(`% Error opening camera: ${e}`);
-    });
-    
-    streamCamera.on('frame', data => {
-        // you can add some processing to frame data here
-        // e.g let Mat = cv.imdecode(data)
-        console.log('tengo frame');
-        if(hayPresencia==false)
-        {
-            nombreVideo=null;
-        }
-        console.log(socketCerebro);
-        broadcastFrame(data);
-    });
-    return streamCamera;
-}
-function stopCamera(streamCamera) {
-    //streamCamera.stopCapture();
-    if(hayPresencia==true)
-    {
-        if(deteccionMientras==false)
-        {
-            console.log('paro el video');
-            streamCamera.stopCapture().then(() => {
-                cameraInUse=false;
-                deteccionMientras=false;
-                parando=false;
-                hayPresencia=false;
-                socketCentral.emit('finVideo',{
-                    video:nombreVideo,
-                    serial:serial
-                })
-                contadorImagen=0;
-            });
-        }
-        else
-        {
-            console.log('no paro el video porque aun hay alguien');
-            deteccionMientras=false;
-            clearTimeout(timer);
-            timer=setTimeout(paraGrabacion,15000);
-        }
-    }
-    else
-    {
-        streamCamera.stopCapture(); 
-    }
-    
-}
+
 
 //var streamCamera=startCamera(socketCliente);
 
@@ -222,3 +135,95 @@ sensorPresencia.watch((err, value) => {
 });
 socketCentral=openServerCentral();
 socketCerebro=openServerCerebro();
+
+function broadcastFrame(data,nombreVideo=null) {
+    if(hayPresencia==true)
+    {
+        socketCentral.emit('imagenPresencia',{
+            frame:data,
+            camera:serial,
+            video:nombreVideo,
+            contador:contadorImagen
+        });
+        contadorImagen++;
+        socketCerebro.emit('presenciaFrame',{
+            frame:data,
+            serial:serial
+        });
+    }
+    else
+    {
+        socketCentral.emit('imagenLive',{
+            frame:data,
+            camera:serial
+    
+        });
+    }
+    
+};
+
+
+function startCamera(nombreVideo) {
+    //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
+    const streamCamera = new StreamCamera({
+        codec: Codec.MJPEG,
+        fps: 2,
+        width: 640,
+        height: 480,
+        // increase this to reduce compression artefacts
+        bitRate: 10000000,
+        flip:Flip.Both
+    });
+    streamCamera.startCapture().then(() => {
+        console.log(`# Camera started`);
+    })
+    .catch(e => {
+        console.log(`% Error opening camera: ${e}`);
+    });
+    
+    streamCamera.on('frame', data => {
+        // you can add some processing to frame data here
+        // e.g let Mat = cv.imdecode(data)
+        console.log('tengo frame');
+        if(hayPresencia==false)
+        {
+            nombreVideo=null;
+        }
+        console.log(socketCerebro);
+        broadcastFrame(data,nombreVideo);
+    });
+    return streamCamera;
+}
+function stopCamera(streamCamera) {
+    //streamCamera.stopCapture();
+    if(hayPresencia==true)
+    {
+        if(deteccionMientras==false)
+        {
+            console.log('paro el video');
+            streamCamera.stopCapture().then(() => {
+                cameraInUse=false;
+                deteccionMientras=false;
+                parando=false;
+                hayPresencia=false;
+                socketCentral.emit('finVideo',{
+                    video:nombreVideo,
+                    serial:serial
+                })
+                contadorImagen=0;
+            });
+        }
+        else
+        {
+            console.log('no paro el video porque aun hay alguien');
+            deteccionMientras=false;
+            clearTimeout(timer);
+            timer=setTimeout(paraGrabacion,15000);
+        }
+    }
+    else
+    {
+        streamCamera.stopCapture(); 
+    }
+    
+}
