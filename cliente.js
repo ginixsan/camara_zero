@@ -23,24 +23,24 @@ let timer;
 let nombreVideo;
 let contadorImagen=0;
 
-function broadcastFrame(data,socket,nombreVideo=null) {
+function broadcastFrame(data,socket1,socket2,nombreVideo=null) {
     if(hayPresencia==true)
     {
-        socket.emit('imagenPresencia',{
+        socket1.emit('imagenPresencia',{
             frame:data,
             camera:serial,
             video:nombreVideo,
             contador:contadorImagen
         });
         contadorImagen++;
-        socketCerebro.emit('presenciaFrame',{
+        socket2.emit('presenciaFrame',{
             frame:data,
             serial:serial
         });
     }
     else
     {
-        socket.emit('imagenLive',{
+        socket1.emit('imagenLive',{
             frame:data,
             camera:serial
     
