@@ -32,7 +32,7 @@ function saltaFrames(value) {
 }
 
 
-function broadcastFrame(data,nombreVideo=null,socket1,socket2=null) {
+function broadcastFrame(data,nombreVideo=null) {
     if(hayPresencia==true)
     {
         socketCentral.emit('imagenPresencia',{
@@ -41,14 +41,14 @@ function broadcastFrame(data,nombreVideo=null,socket1,socket2=null) {
             video:nombreVideo,
             contador:contadorImagen
         });
-        contadorImagen++;
-        if(saltaFrames(contadorImagen))
-        {
-            socketCerebro.emit('presenciaFrame',{
-                frame:data,
-                serial:serial
-            });
-        }
+        // contadorImagen++;
+        // if(saltaFrames(contadorImagen))
+        // {
+        //     socketCerebro.emit('presenciaFrame',{
+        //         frame:data,
+        //         serial:serial
+        //     });
+        // }
         
     }
     else
@@ -63,7 +63,7 @@ function broadcastFrame(data,nombreVideo=null,socket1,socket2=null) {
 };
 
 
-async function startCamera(socket1,socket2=null,nombreVideo=null) {
+async function startCamera() {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
@@ -76,6 +76,7 @@ async function startCamera(socket1,socket2=null,nombreVideo=null) {
     });
     await streamCamera.startCapture().then(() => {
         console.log(`# Camera started`);
+        cameraInUse=true;
     })
     .catch(e => {
         console.log(`% Error opening camera: ${e}`);
@@ -85,49 +86,79 @@ async function startCamera(socket1,socket2=null,nombreVideo=null) {
         // you can add some processing to frame data here
         // e.g let Mat = cv.imdecode(data)
         //console.log('tengo frame');
+
         if(hayPresencia==false)
         {
             nombreVideo=null;
-            broadcastFrame(data,nombreVideo,socket1)
         }
-        else
-        {
-            broadcastFrame(data,nombreVideo,socket1,socket2);
-        }
+        broadcastFrame(data,nombreVideo)
         
     });
     return streamCamera;
 }
-function stopCamera(streamCamera) {
+async function stopCamera(streamCamera) {
     //streamCamera.stopCapture();
     if(hayPresencia==true)
     {
         if(deteccionMientras==false)
         {
             console.log('paro el video');
-            streamCamera.stopCapture().then(() => {
-                cameraInUse=false;
-                deteccionMientras=false;
-                parando=false;
-                hayPresencia=false;
-                socketCentral.emit('finVideo',{
-                    video:nombreVideo,
-                    serial:serial
-                })
-                contadorImagen=0;
-            });
+            (async () =>{
+                paraSensor(sensorPresencia,function(){
+                    streamCamera.stopCapture().then(() => {
+                        cameraInUse=false;
+                        deteccionMientras=false;
+                        parando=false;
+                        hayPresencia=false;
+                        socketCentral.emit('finVideo',{
+                            video:nombreVideo,
+                            serial:serial
+                        });
+                        contadorImagen=0;
+                    });
+                });
+            })();
         }
         else
         {
             console.log('no paro el video porque aun hay alguien');
             deteccionMientras=false;
             clearTimeout(timer);
-            timer=setTimeout(paraGrabacion,15000);
+            timer=setTimeout(function(){
+                (async () =>{
+                    paraSensor(sensorPresencia,function(){
+                        streamCamera.stopCapture().then(() => {
+                            cameraInUse=false;
+                            deteccionMientras=false;
+                            parando=false;
+                            hayPresencia=false;
+                            socketCentral.emit('finVideo',{
+                                video:nombreVideo,
+                                serial:serial
+                            })
+                            contadorImagen=0;
+                            arrancaSensor(sensorPresencia);
+                        });
+                    });
+                })();
+            },15000);
         }
     }
     else
     {
-        streamCamera.stopCapture(); 
+        (async () =>{
+            paraSensor(sensorPresencia,function(){
+                streamCamera.stopCapture().then(() => {
+                    cameraInUse=false;
+                    deteccionMientras=false;
+                    parando=false;
+                    hayPresencia=false;
+                    contadorImagen=0;
+                    arrancaSensor(sensorPresencia);
+                });
+            });
+            
+        })(); 
     }
     
 }
@@ -202,10 +233,62 @@ async function openServerCerebro()
 
 
 //var streamCamera=startCamera(socketCliente);
+function arrancaSensor(sensor)
+{
+    sensor.watch((err, value) => {
+        if (err) {
+            throw err;
+        }
+        if(value==1)
+        {
+            //hay presencia
+            if(cameraInUse==false)
+            {
+                (async () =>{
+                    console.log('hay alguien');
+                    console.log('grabo video');
+                    hayPresencia=true;
+                    nombreVideo=serial+'_'+moment().format("DD_MM_YYYY_HH_mm_ss_SSS");
+                    camara=await startCamera(nombreVideo);
+                })();
+            }
+            else
+            {
+                console.log('ya esta grabando por lo que no hago nada?');
+                if(parando==true)
+                {
+                    deteccionMientras=true;
+                }
+            }
+        }
+        else
+        {
+            //deja de haber presencia
+            console.log('no hay nadie');
+            if(cameraInUse==true)
+            {
+                parando=true;
+                timer=setTimeout(function(){
+                    (async () =>{
+                        await stopCamera(camara);
+                    })();
+                },15000);
+            }
+        }
+    });
+}
+
+function paraSensor(sensor,callback)
+{
+    sensor.unwatch(function(){
+        callback();
+    });
+}
 
 (async () =>{
     await openServerCentral();
     await openServerCerebro();
+    arrancaSensor(sensorPresencia);
     // sensorPresencia.watch((err, value) => {
     //     if (err) {
     //         throw err;
