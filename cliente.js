@@ -194,45 +194,45 @@ async function openServerCerebro()
 (async () =>{
     await openServerCentral();
     await openServerCerebro();
-    // sensorPresencia.watch((err, value) => {
-    //     if (err) {
-    //         throw err;
-    //     }
-    //     if(value==1)
-    //     {
-    //         hayPresencia=true;
-    //         if(anterior==0)
-    //         {
-    //             if(parando==true)
-    //             {
-    //                 deteccionMientras=true;
-    //             }
-    //             else
-    //             {
-    //                 if(cameraInUse==false)
-    //                 {
-    //                     console.log('hay alguien');
-    //                     console.log('grabo video');
-    //                     nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
-    //                     camara=startCamera(socketCentral,socketCerebro,nombreVideo);
-    //                 }
-    //             }
-    //             anterior=1;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         console.log('no hay nadie');
-    //         if(cameraInUse==true)
-    //         {
-    //             parando=true;
-    //             timer=setTimeout(stopCamera(camara),15000);
-    //         }
-    //         if(anterior==1)
-    //         {
-    //             anterior=0;
-    //         }
-    //     }
-    // });
+    sensorPresencia.watch((err, value) => {
+        if (err) {
+            throw err;
+        }
+        if(value==1)
+        {
+            hayPresencia=true;
+            if(anterior==0)
+            {
+                if(parando==true)
+                {
+                    deteccionMientras=true;
+                }
+                else
+                {
+                    if(cameraInUse==false)
+                    {
+                        console.log('hay alguien');
+                        console.log('grabo video');
+                        nombreVideo=moment().format("DD_MM_YYYY_HH_mm_ss_SSS")+'.h264';
+                        camara=startCamera(socketCentral,socketCerebro,nombreVideo);
+                    }
+                }
+                anterior=1;
+            }
+        }
+        else
+        {
+            console.log('no hay nadie');
+            if(cameraInUse==true)
+            {
+                parando=true;
+                timer=setTimeout(stopCamera(camara),15000);
+            }
+            if(anterior==1)
+            {
+                anterior=0;
+            }
+        }
+    });
 })();
 
