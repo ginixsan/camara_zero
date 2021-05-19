@@ -7,7 +7,7 @@ const moment=require('moment');
 const Gpio = require('pigpio').Gpio;
 var SocketIO = require('socket.io-client');
 var sensorPresencia = new Gpio(26, {mode: Gpio.INPUT, alert: true});
-
+const bajasube=require('./bajasube.js');
 
 var camara;
 var socketCentral;
@@ -182,6 +182,12 @@ async function openServerCentral() {
         });
         socketCliente.on('startLive', function(data){
             camara=startCamera(socketCliente);
+        });
+        socketCliente.on('bajaNuevaVersion', function(data){
+            bajasube.bajaNuevaVersion(data.url,data.directorio,data.proceso);
+        });
+        socketCliente.on('getLogs', function(data){
+            bajasube.enviaLogs(data.directorioLogs,serial,data.direccion);
         });
         socketCliente.on('disconnect', function(){
             console.log('me he desoncectado');
