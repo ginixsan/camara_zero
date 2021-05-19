@@ -174,6 +174,7 @@ async function openServerCentral() {
 
         socketCliente.on('connect', function(){
             console.log('conectado central');
+            socketCliente.join('camaras');
             socketCentral=socketCliente;
         });
 
@@ -217,7 +218,8 @@ async function openServerCerebro()
         });
         encrypt('secreto')(socket1);
         socket1.on('connect', function(){
-            console.log('conectado cerebro')
+            console.log('conectado cerebro');
+            socket1.join('camaras');
             socketCerebro=socket1;
         });
 
