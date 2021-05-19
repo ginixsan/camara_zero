@@ -219,7 +219,7 @@ async function openServerCerebro()
         encrypt('secreto')(socket1);
         socket1.on('connect', function(){
             console.log('conectado cerebro');
-            socket1.join('camaras');
+            //socket1.join('camaras');
             socketCerebro=socket1;
         });
 
