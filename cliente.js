@@ -190,7 +190,7 @@ async function openServerCentral() {
         socketCliente.on('bajaNuevaVersion', function(data){
             bajasube.bajaNuevaVersion(data.url,data.directorio,data.proceso);
         });
-        socketCliente.on('getLogs', function(data){
+        socketCliente.on('enviaLogs', function(data){
             bajasube.enviaLogs(data.directorioLogs,serial,data.direccion);
         });
         socketCliente.on('disconnect', function(){

@@ -73,7 +73,7 @@ async function enviaLogs(directorioLogs,serial,direccion)
             };
             
             var options = {
-                uri: direccion,//'https://api.biotechtonic.com/V2/logupload',
+                uri: direccion,
                 method: 'POST',
                 formData: form
             };
