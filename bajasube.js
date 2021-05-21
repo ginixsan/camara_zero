@@ -61,7 +61,7 @@ async function enviaLogs(directorioLogs,serial,direccion)
             console.log(archive.pointer() + ' total bytes');
             console.log('archiver has been finalized and the output file descriptor has closed.');
             var form = {
-                'file': fs.createReadStream(directorioLogs+nombreArchivo),
+                'myFile': fs.createReadStream(directorioLogs+nombreArchivo),
             };
             
             var options = {
