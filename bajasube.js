@@ -6,52 +6,44 @@ const { exec,execSync } = require("child_process");
 const moment = require('moment');
 
 async function bajaNuevaVersion(url,directorio,proceso){
-    var options = {
-        method: "GET",
-        encoding: null,
-        contentType: 'application/zip',
-        url: url
-    };
-    request(options, function(error, response, body) {
-        if (error || response.statusCode !== 200) {
-            try {
-                console.log("failed to get repo ", response.statusCode);
-            } catch (e) {
-                console.log(e);
-            }
-            ///'Content-Type', 'application/zip'
-            console.log(error);
-        } else {
-
-            //// we got the repo!
-            console.log('me bajo el repo');
-            fs.writeFile('repo.zip', body, function(err) {
-                console.log("file written!");
+    const response = await Axios({
+        method: 'GET',
+        url: url,
+        responseType: 'stream',
+    });
+    response.data.pipe(Fs.createWriteStream('repo.zip'));
+    return new Promise((resolve, reject) => {
+            response.data.on('end', () => {
                 (async () => {
                     try {
-                        await extract('./repo.zip', { dir: __dirname})
+                        await extract('./repo.zip', { dir: directorio})
                         console.log('Extraction complete');
                         fs.unlinkSync("./repo.zip");
                         let vuelta = execSync('npm install');
                         exec("pm2 restart "+proceso, (error, stdout, stderr) => {
                             if (error) {
                                 console.log(`error: ${error.message}`);
-                                return;
+                                reject(error);
                             }
                             if (stderr) {
                                 console.log(`stderr: ${stderr}`);
-                                return;
+                                reject(stderr);
                             }
                             console.log(`stdout: ${stdout}`);
+                            resolve();
                         });
                     } catch (err) {
                         // handle any errors
                         console.log(err);
+                        reject(err);
+
                     } 
                 })();
-            });
-        }
-    });
+            })
+            response.data.on('error', () => {
+                reject(err);
+            })        
+        });
 }
 
 async function enviaLogs(directorioLogs,serial,direccion)
