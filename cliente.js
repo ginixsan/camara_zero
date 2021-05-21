@@ -180,7 +180,9 @@ async function openServerCentral() {
             //socketCliente.join('camaras');
             socketCentral=socketCliente;
         });
-
+        socket.on("connect_error", (err) => {
+            console.log(`connect_error due to ${err.message}`);
+        });
         socketCliente.on('stopLive', function(data){
             stopCamera(camara);
         });
@@ -199,6 +201,24 @@ async function openServerCentral() {
         socketCliente.on('disconnect', function(){
             console.log('me he desoncectado');
             if(cameraInUse==true) stopCamera(camara);
+        });
+        socketCliente.on('reconnect', function(numero){
+            console.log('me he reconnect '+numero+' veces');
+        });
+        socketCliente.on('reconnecting', function(numero){
+            console.log('me he reconnecting '+numero+' veces');
+        });
+        socketCliente.on('connect_timeout', function(){
+            console.log('me he connect_timeout');
+        });
+        socketCliente.on('reconnect_attempt', function(){
+            console.log('me he reconnect_attempt');
+        });
+        socketCliente.on('reconnect_failed', function(){
+            console.log('me he reconnect_failed');
+        });
+        socketCliente.on('reconnect_error', function(err){
+            console.log(`connect_error due to ${err.message}`);
         });
     return socketCliente;
 });
