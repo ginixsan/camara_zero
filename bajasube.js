@@ -29,7 +29,7 @@ async function bajaNuevaVersion(url,directorio,proceso){
                 console.log("file written!");
                 (async () => {
                     try {
-                        await extract('./repo.zip', { dir: directorio})
+                        await extract('./repo.zip', { dir: __dirname})
                         console.log('Extraction complete');
                         fs.unlinkSync("./repo.zip");
                         let vuelta = execSync('npm install');
