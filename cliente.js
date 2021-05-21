@@ -178,7 +178,7 @@ async function openServerCentral() {
             socketCentral=socketCliente;
         });
         socketCliente.on("connect_error", (err) => {
-            console.log(`connect_error due to ${err.message}`);
+            console.log(`connect_error due to ${err}`);
         });
         socketCliente.on('stopLive', function(data){
             stopCamera(camara);
