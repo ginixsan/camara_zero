@@ -195,7 +195,7 @@ async function openServerCentral() {
         });
         socketCliente.on('disconnect', function(){
             console.log('me he desoncectado');
-            stopCamera(camara);
+            if(cameraInUse==true) stopCamera(camara);
         });
     return socketCliente;
 });
