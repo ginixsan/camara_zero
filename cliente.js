@@ -188,6 +188,7 @@ async function openServerCentral() {
             camara=startCamera(socketCliente);
         });
         socketCliente.on('bajaNuevaVersion', function(data){
+            console.log('llega nueva version');
             bajasube.bajaNuevaVersion(data.url,data.directorio,data.proceso);
         });
         socketCliente.on('enviaLogsCamaras', function(data){
