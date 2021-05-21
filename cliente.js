@@ -189,7 +189,9 @@ async function openServerCentral() {
         });
         socketCliente.on('bajaNuevaVersion', function(data){
             console.log('llega nueva version');
-            bajasube.bajaNuevaVersion(data.url,data.directorio,data.proceso);
+            (async () => {
+                await bajasube.bajaNuevaVersion(data.url,data.directorio,data.proceso);
+            });
         });
         socketCliente.on('enviaLogsCamaras', function(data){
             bajasube.enviaLogs(data.directorioLogs,serial,data.direccion);
