@@ -169,9 +169,6 @@ async function openServerCentral() {
             access_token: 'camaron',
             serial:serial,
             tipo:'camara'
-            },
-            auth: {
-                token: "camaron"
             }
         });
 
@@ -237,11 +234,9 @@ async function openServerCerebro()
         console.log('el serial es '+serial);
         var socket1 = SocketIO(config.SERVIDOR,{
             query: {
+            access_token: 'camaron',
             serial:serial,
             camera:true
-            },
-            auth: {
-                token: 'camaron'
             }
         });
         encrypt('secreto')(socket1);
