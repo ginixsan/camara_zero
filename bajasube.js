@@ -52,7 +52,7 @@ async function enviaLogs(directorioLogs,serial,direccion)
         console.log('hay que enviar logs');
         const fecha=moment().format("DD_MM_YYYY_HH_mm_ss");
         const nombreArchivo=fecha+'_'+serial+'.zip';
-        const output = fs.createWriteStream("./"+directorioLogs+"/"+nombreArchivo);
+        const output = fs.createWriteStream(directorioLogs+nombreArchivo);
         const archive = archiver('zip', {
         zlib: { level: 9 } // Sets the compression level.
         });
@@ -61,7 +61,7 @@ async function enviaLogs(directorioLogs,serial,direccion)
             console.log(archive.pointer() + ' total bytes');
             console.log('archiver has been finalized and the output file descriptor has closed.');
             var form = {
-                'file': fs.createReadStream("./"+directorioLogs+"/"+nombreArchivo),
+                'file': fs.createReadStream(directorioLogs+nombreArchivo),
             };
             
             var options = {
@@ -74,8 +74,8 @@ async function enviaLogs(directorioLogs,serial,direccion)
                 if (!error && response.statusCode == 200) {
                     console.log('enviado zip logs')
                     console.log(body);
-                    fs.unlinkSync("./"+directorioLogs+"/"+nombreArchivo);
-                    exec("pm2 flush rasp", (error, stdout, stderr) => {
+                    fs.unlinkSync(directorioLogs+nombreArchivo);
+                    exec("pm2 flush camara", (error, stdout, stderr) => {
                         if (error) {
                             console.log(`error: ${error.message}`);
                             return;
@@ -104,7 +104,7 @@ async function enviaLogs(directorioLogs,serial,direccion)
             });
         });
         archive.pipe(output);
-        archive.directory("./"+directorioLogs, false);
+        archive.directory(directorioLogs, false);
         archive.finalize();
     })();
 }
