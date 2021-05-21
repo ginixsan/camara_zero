@@ -35,8 +35,8 @@
     "pi-camera-connect": "^0.3.4",
     "pigpio": "^3.3.1",
     "request": "^2.88.2",
-    "socket.io": "^2.4.1",
-    "socket.io-client": "^4.1.2",
+    "socket.io": "2.4.1",
+    "socket.io-client": "2.4.1",
     "socket.io-encrypt": "^0.2.1"
   }
 }
