@@ -270,6 +270,12 @@ async function openServerCerebro()
         socket1.on('reconnect_error', function(err){
             console.log(`connect_error due to ${err.message}`);
         });
+        socket1.on('noWifi', function(data){
+            console.log('llega no hay wifi');
+        });
+        socket1.on('yesWifi', function(data){
+            console.log('llega si hay wifi');
+        });
         return socket1;
     }); 
 }
