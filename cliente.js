@@ -272,9 +272,19 @@ async function openServerCerebro()
         });
         socket1.on('noWifi', function(data){
             console.log('llega no hay wifi');
+            /*
+                sudo ufw allow to 192.168.1.0/24
+                sudo ufw allow from 192.168.1.0/24
+                sudo ufw enable
+            */
         });
         socket1.on('yesWifi', function(data){
             console.log('llega si hay wifi');
+            /*
+                sudo delete ufw allow to 192.168.1.0/24
+                sudo delete ufw allow from 192.168.1.0/24
+                sudo ufw disable
+            */
         });
         return socket1;
     }); 
