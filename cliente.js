@@ -6,8 +6,18 @@ const exec = require( 'child_process' ).exec;
 const moment=require('moment');
 const Gpio = require('pigpio').Gpio;
 var SocketIO = require('socket.io-client');
+const fs=require('fs');
 var sensorPresencia = new Gpio(26, {mode: Gpio.INPUT, alert: true});
 const bajasube=require('./bajasube.js');
+
+
+const zeroPad = (num, places) => String(num).padStart(places, '0');
+
+const getDirectories = source =>
+    fs.readdirSync(source, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
+
 
 var camara;
 var socketCentral;
@@ -22,7 +32,8 @@ let parando=false;
 let timer;
 let nombreVideo;
 let contadorImagen=0;
-
+let hayWifi=true;
+let contador=0;
 
 function saltaFrames(value) {
 	if (value%6== 0||(value<6 && value%2==0)||value==0)
@@ -32,7 +43,7 @@ function saltaFrames(value) {
 }
 
 
-function broadcastFrame(data,nombreVideo=null) {
+function broadcastFrame(data,contadorImagen,nombreVideo=null) {
     if(hayPresencia==true)
     {
         socketCentral.emit('imagenPresencia',{
@@ -42,7 +53,7 @@ function broadcastFrame(data,nombreVideo=null) {
             contador:contadorImagen,
             presencia:true
         });
-        contadorImagen++;
+        //contadorImagen++;
         if(saltaFrames(contadorImagen))
         {
             socketCerebro.emit('presenciaFrame',{
@@ -78,6 +89,10 @@ async function startCamera() {
     await streamCamera.startCapture().then(() => {
         console.log(`# Camera started`);
         cameraInUse=true;
+        if(hayWifi==false)
+        {
+            fs.mkdir('./videos/'+nombreVideo);
+        }
     })
     .catch(e => {
         console.log(`% Error opening camera: ${e}`);
@@ -92,7 +107,15 @@ async function startCamera() {
         {
             nombreVideo=null;
         }
-        broadcastFrame(data,nombreVideo)
+        if(hayWifi==true)
+        {
+            broadcastFrame(data,nombreVideo,contadorImagen);
+        }
+        else
+        {
+            fs.writeFile('./videos/'+nombreVideo+'/image'+zeroPad(contadorImagen,7)+'.jpeg', data);
+        }
+        contadorImagen++;
         
     });
     return streamCamera;
@@ -146,6 +169,7 @@ async function stopCamera(streamCamera) {
                     hayPresencia=false;
                     contadorImagen=0;
                     presencia=false;
+                    contador=0;
                     sensorPresencia.enableAlert();
                 });
             
@@ -272,6 +296,7 @@ async function openServerCerebro()
         });
         socket1.on('noWifi', function(data){
             console.log('llega no hay wifi');
+            hayWifi=false;
             /*
                 sudo ufw allow to 192.168.1.0/24
                 sudo ufw allow from 192.168.1.0/24
@@ -280,6 +305,27 @@ async function openServerCerebro()
         });
         socket1.on('yesWifi', function(data){
             console.log('llega si hay wifi');
+            hayWifi=true; 
+            var directorio=require('path').resolve(__dirname+'/videos');
+            var dirs=getDirectories(directorio);
+            console.log(dirs);
+            dirs.map((dir)=>{
+                let directoryPath = './videos'+dir;
+                //passsing directoryPath and callback function
+                let files = fs.readdirSync(directoryPath);
+                if(files.length>0)
+                {
+                    for (const file of files) {
+                        (async () =>{
+                            const contents = fs.readFileSync(directoryPath+'/'+file);
+                            console.log(contents);
+                            //TODO: enviar las imagenes
+                        })();
+                    }
+                    fs.rmdirSync(directoryPath, { recursive: true });
+                }
+                
+            });
             /*
                 sudo delete ufw allow to 192.168.1.0/24
                 sudo delete ufw allow from 192.168.1.0/24
