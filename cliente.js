@@ -296,6 +296,10 @@ async function openServerCerebro()
         });
         socket1.on('noWifi', function(data){
             console.log('llega no hay wifi');
+            exec('sudo ufw enable',(error,stdout,stderr) => {
+                console.log(stdout);
+                hayWifi=false;
+            });
             //hayWifi=false;
             /*
                 sudo ufw allow to 192.168.1.0/24
@@ -304,7 +308,11 @@ async function openServerCerebro()
             */
         });
         socket1.on('yesWifi', function(data){
-            console.log('llega si hay wifi');
+            console.log('llega si hay wifi'); 
+            exec('sudo ufw disable',(error,stdout,stderr) => {
+                console.log(stdout);
+                hayWifi=true; 
+            });
             // hayWifi=true; 
             // var directorio=require('path').resolve(__dirname+'/videos');
             // var dirs=getDirectories(directorio);
