@@ -297,8 +297,19 @@ async function openServerCerebro()
         socket1.on('noWifi', function(data){
             console.log('llega no hay wifi');
             exec('sudo ufw enable',(error,stdout,stderr) => {
-                console.log(stdout);
-                hayWifi=false;
+                if(error)
+                {
+                    console.log(error);
+                }
+                else
+                {
+                    if(stderr)
+                    {
+                        console.log(stderr);
+                    }
+                    console.log(stdout);
+                    hayWifi=false;
+                }
             });
             //hayWifi=false;
             /*
@@ -310,29 +321,41 @@ async function openServerCerebro()
         socket1.on('yesWifi', function(data){
             console.log('llega si hay wifi'); 
             exec('sudo ufw disable',(error,stdout,stderr) => {
-                console.log(stdout);
-                hayWifi=true; 
-                var directorio=require('path').resolve(__dirname+'/videos');
-                var dirs=getDirectories(directorio);
-                console.log(dirs);
-                dirs.map((dir)=>{
-                    let directoryPath = './videos/'+dir;
-                    //passsing directoryPath and callback function
-                    let files = fs.readdirSync(directoryPath);
-                    if(files.length>0)
+                if(error)
+                {
+                    console.log(error);
+                }
+                else
+                {
+                    if(stderr)
                     {
-                        let contador=0;
-                        for (const file of files) {
-                            (async () =>{
-                                const contents = fs.readFileSync(directoryPath+'/'+file);
-                                console.log(contents);
-                                //TODO: enviar las imagenes
-                                broadcastFrame(contents,directoryPath,contador);
-                                contador++;
-                            })();
+                        console.log(stderr);
+                    }
+                    console.log(stdout);
+                    hayWifi=true; 
+                    var directorio=require('path').resolve(__dirname+'/videos');
+                    var dirs=getDirectories(directorio);
+                    console.log(dirs);
+                    dirs.map((dir)=>{
+                        let directoryPath = './videos/'+dir;
+                        //passsing directoryPath and callback function
+                        let files = fs.readdirSync(directoryPath);
+                        if(files.length>0)
+                        {
+                            let contador=0;
+                            for await (file of files) {
+                                (async () =>{
+                                    const contents = fs.readFileSync(directoryPath+'/'+file);
+                                    console.log(contents);
+                                    broadcastFrame(contents,directoryPath,contador);
+                                    contador++;
+                                })();
+                            }
+                            fs.rmdirSync(directoryPath, { recursive: true });
                         }
-                        fs.rmdirSync(directoryPath, { recursive: true });
-                });
+                    }); 
+                }
+                
             });
             // hayWifi=true; 
             
