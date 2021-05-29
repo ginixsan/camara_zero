@@ -274,7 +274,7 @@ async function openServerCerebro()
             console.log('me he desoncectado');
         });
         socket1.on("connect_error", (err) => {
-            console.log(`connect_error due to ${err.message}`);
+            console.log(`connect_error due to ${err}`);
         });
         socket1.on('reconnect', function(numero){
             console.log('me he reconnect '+numero+' veces');
@@ -292,7 +292,7 @@ async function openServerCerebro()
             console.log('me he reconnect_failed');
         });
         socket1.on('reconnect_error', function(err){
-            console.log(`connect_error due to ${err.message}`);
+            console.log(`connect_error due to ${err}`);
         });
         socket1.on('noWifi', function(data){
             console.log('llega no hay wifi');
