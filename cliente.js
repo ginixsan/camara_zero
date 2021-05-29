@@ -312,27 +312,30 @@ async function openServerCerebro()
             exec('sudo ufw disable',(error,stdout,stderr) => {
                 console.log(stdout);
                 hayWifi=true; 
+                var directorio=require('path').resolve(__dirname+'/videos');
+                var dirs=getDirectories(directorio);
+                console.log(dirs);
+                dirs.map((dir)=>{
+                    let directoryPath = './videos/'+dir;
+                    //passsing directoryPath and callback function
+                    let files = fs.readdirSync(directoryPath);
+                    if(files.length>0)
+                    {
+                        let contador=0;
+                        for (const file of files) {
+                            (async () =>{
+                                const contents = fs.readFileSync(directoryPath+'/'+file);
+                                console.log(contents);
+                                //TODO: enviar las imagenes
+                                broadcastFrame(contents,directoryPath,contador);
+                                contador++;
+                            })();
+                        }
+                        fs.rmdirSync(directoryPath, { recursive: true });
+                });
             });
             // hayWifi=true; 
-            // var directorio=require('path').resolve(__dirname+'/videos');
-            // var dirs=getDirectories(directorio);
-            // console.log(dirs);
-            // dirs.map((dir)=>{
-            //     let directoryPath = './videos'+dir;
-            //     //passsing directoryPath and callback function
-            //     let files = fs.readdirSync(directoryPath);
-            //     if(files.length>0)
-            //     {
-            //         for (const file of files) {
-            //             (async () =>{
-            //                 const contents = fs.readFileSync(directoryPath+'/'+file);
-            //                 console.log(contents);
-            //                 //TODO: enviar las imagenes
-            //             })();
-            //         }
-            //         fs.rmdirSync(directoryPath, { recursive: true });
-            //            
-            // });
+            
             /*
                 sudo delete ufw allow to 192.168.1.0/24
                 sudo delete ufw allow from 192.168.1.0/24
