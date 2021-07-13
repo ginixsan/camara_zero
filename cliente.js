@@ -1,7 +1,6 @@
 var config = require('./config');
 const { StreamCamera, Codec, Rotation, Flip } = require('pi-camera-connect');
 const io = require("socket.io-client");
-const encrypt = require('socket.io-encrypt');
 const exec = require('child_process').exec;
 const moment = require('moment');
 const Gpio = require('pigpio').Gpio;
@@ -251,7 +250,6 @@ async function openServerCerebro() {
                 camera: true
             }
         });
-        encrypt('secreto')(socket1);
         socket1.on('connect', function () {
             console.log('conectado cerebro');
             //socket1.join('camaras');
