@@ -322,14 +322,16 @@ async function openServerCerebro() {
                         let files = fs.readdirSync(directoryPath);
                         if (files.length > 0) {
                             let contador = 0;
-                            for await (file of files) {
-                                (async () => {
-                                    const contents = fs.readFileSync(directoryPath + '/' + file);
-                                    console.log(contents);
-                                    broadcastFrame(contents, directoryPath, contador);
-                                    contador++;
-                                })();
-                            }
+                            (async () =>{
+                                for await (file of files) {
+                                    (async () => {
+                                        const contents = fs.readFileSync(directoryPath + '/' + file);
+                                        console.log(contents);
+                                        broadcastFrame(contents, directoryPath, contador);
+                                        contador++;
+                                    })();
+                                }
+                            })();
                             fs.rmdirSync(directoryPath, { recursive: true });
                         }
                     });
