@@ -102,7 +102,7 @@ async function startCamera(nombreVideo) {
             nombreVideo = null;
         }
         if (hayWifi == true) {
-            broadcastFrame(data, nombreVideo, contadorImagen);
+            broadcastFrame(data, contadorImagen,nombreVideo);
         }
         else {
             fs.writeFile('./videos/' + nombreVideo + '/image' + zeroPad(contadorImagen, 7) + '.jpeg', data);
@@ -329,7 +329,7 @@ async function openServerCerebro() {
                                     (async () => {
                                         const contents = fs.readFileSync(directoryPath + '/' + file);
                                         console.log(contents);
-                                        broadcastFrame(contents, directoryPath, contador);
+                                        broadcastFrame(contents,contador, directoryPath );
                                         contador++;
                                     })();
                                 }
