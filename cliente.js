@@ -8,7 +8,7 @@ var SocketIO = require('socket.io-client');
 const fs = require('fs');
 var sensorPresencia = new Gpio(26, { mode: Gpio.INPUT, alert: true });
 const bajasube = require('./bajasube.js');
-
+let enviaLive=false;
 
 const zeroPad = (num, places) => String(num).padStart(places, '0');
 
@@ -63,8 +63,8 @@ function broadcastFrame(data, contadorImagen, nombreVideo = null) {
     else {
         socketCentral.emit('imagenLive', {
             frame: data,
-            camera: serial
-
+            camera: serial,
+            live:true
         });
     }
 
@@ -193,9 +193,11 @@ async function openServerCentral() {
         });
         socketCliente.on('stopLive', function (data) {
             stopCamera(camara);
+            enviaLive=false;
         });
         socketCliente.on('startLive', function (data) {
             camara = startCamera(socketCliente);
+            enviaLive=true;
         });
         socketCliente.on('bajaNuevaVersion', function (data) {
             console.log('llega nueva version');
