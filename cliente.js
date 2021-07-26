@@ -80,7 +80,7 @@ async function startCamera() {
         height: 480,
         // increase this to reduce compression artefacts
         bitRate: 10000000,
-        flip: Flip.Both
+        //flip: Flip.Both
     });
     await streamCamera.startCapture().then(() => {
         console.log(`# Camera started`);
