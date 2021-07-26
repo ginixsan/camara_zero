@@ -71,7 +71,7 @@ function broadcastFrame(data, contadorImagen, nombreVideo = null) {
 };
 
 
-async function startCamera() {
+async function startCamera(nombreVideo) {
     //TODO: SI EMPEZAMOS POR PRESENCIA QUE GRABE CON ALGO MAS DE DEFINICION?
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
