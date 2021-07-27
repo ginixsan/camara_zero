@@ -94,14 +94,25 @@ function broadcastFrame(data, contadorImagen, nombreVideo = null) {
                 serial: serial
             });
         }
+        if(enviaLive==true)
+        {
+            socketCentral.emit('imagenLive', {
+                frame: data,
+                camera: serial,
+                live:true
+            });
+        }
 
     }
     else {
-        socketCentral.emit('imagenLive', {
-            frame: data,
-            camera: serial,
-            live:true
-        });
+        if(enviaLive==true)
+        {
+            socketCentral.emit('imagenLive', {
+                frame: data,
+                camera: serial,
+                live:true
+            });
+        }
     }
 
 };
