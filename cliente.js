@@ -1,5 +1,41 @@
 var config = require('./config');
-const { StreamCamera, Codec, Rotation, Flip } = require('pi-camera-connect');
+/**
+ * ExposureMode.Off
+ExposureMode.Auto
+ExposureMode.Night
+ExposureMode.NightPreview
+ExposureMode.Backlight
+ExposureMode.Spotlight
+ExposureMode.Sports
+ExposureMode.Snow
+ExposureMode.Beach
+ExposureMode.VeryLong
+ExposureMode.FixedFps
+ExposureMode.AntiShake
+ExposureMode.Fireworks
+
+AwbMode.Off
+AwbMode.Auto
+AwbMode.Sun
+AwbMode.Cloud
+AwbMode.Shade
+AwbMode.Tungsten
+AwbMode.Fluorescent
+AwbMode.Incandescent
+AwbMode.Flash
+AwbMode.Horizon
+AwbMode.GreyWorld
+
+SensorMode.AutoSelect
+SensorMode.Mode1
+SensorMode.Mode2
+SensorMode.Mode3
+SensorMode.Mode4
+SensorMode.Mode5
+SensorMode.Mode6
+SensorMode.Mode7
+ */
+const { StreamCamera, Codec, Rotation, Flip,ExposureMode,AwbMode,SensorMode } = require('pi-camera-connect');
 const io = require("socket.io-client");
 const exec = require('child_process').exec;
 const moment = require('moment');
@@ -76,8 +112,8 @@ async function startCamera(nombreVideo) {
     const streamCamera = new StreamCamera({
         codec: Codec.MJPEG,
         fps: 2,
-        width: 640,
-        height: 480,
+        width: 1024,
+        height: 768,
         // increase this to reduce compression artefacts
         bitRate: 10000000,
         //flip: Flip.Both
