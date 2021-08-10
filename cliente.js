@@ -88,7 +88,7 @@ function broadcastFrame(data, contadorImagen, nombreVideo = null) {
             presencia: true
         });
         //contadorImagen++;
-        if (saltaFrames(contadorImagen)) {
+        if (saltaFrames(contadorImagen) && config.PERSONAS=='true') {
             socketCerebro.emit('presenciaFrame', {
                 frame: data,
                 serial: serial

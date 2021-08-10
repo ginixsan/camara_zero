@@ -12,6 +12,6 @@ module.exports = {
     SONIDO:process.env.SONIDO || 1000,
     HUMO:process.env.HUMO || 10000,
     PUERTA:process.env.PUERTA || 1,
-    SENSORES:process.env.SENSORES || false
-
+    SENSORES:process.env.SENSORES || false,
+    PERSONAS:process.env.PERSONAS || false
 }
