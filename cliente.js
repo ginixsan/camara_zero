@@ -89,10 +89,21 @@ function broadcastFrame(data, contadorImagen, nombreVideo = null) {
         });
         //contadorImagen++;
         if (saltaFrames(contadorImagen) && config.PERSONAS=='true') {
-            socketCerebro.emit('presenciaFrame', {
-                frame: data,
-                serial: serial
-            });
+            if(config.PERSONAS=='true')
+            {
+                socketCerebro.emit('presenciaFrame', {
+                    frame: data,
+                    serial: serial
+                });
+            }
+            else
+            {
+                socketCentral.emit('presenciaFrame', {
+                    frame: data,
+                    serial: serial
+                });
+            }
+            
         }
         if(enviaLive==true)
         {
