@@ -30,7 +30,7 @@
     "extract-zip": "^2.0.1",
     "jsoncrypt-rsa": "^1.1.5",
     "method-override": "^3.0.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "morgan": "^1.10.0",
     "onoff": "^6.0.3",
     "pi-camera-connect": "^0.3.4",
